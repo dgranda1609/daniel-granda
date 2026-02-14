@@ -1,0 +1,8 @@
+{
+  "name": "Daniel Rodrigo Portfolio",
+  "description": "A high-performance portfolio for Daniel Rodrigo, audiovisual creator and AI systems builder, featuring immersive scroll-driven animations and premium interactive components.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
