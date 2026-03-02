@@ -34,7 +34,7 @@ const NarrativeText = ({ text, scrollYProgress, start, end, highlightWord, align
   return (
     <motion.div
       style={{ opacity }}
-      className={`absolute ${alignClass} flex flex-col pointer-events-none p-12 md:p-32 max-w-[90vw] md:max-w-4xl`}
+      className={`absolute ${alignClass} flex flex-col pointer-events-none max-w-[80vw] md:max-w-3xl`}
     >
       <h2 className={`font-serif text-36 md:text-56 lg:text-[76px] font-medium tracking-tight ${textAlign} leading-[1.05] text-white mix-blend-difference drop-shadow-[0_4px_30px_rgba(0,0,0,0.8)]`}>
         <WordReveal text={text} progress={wordProgress} highlightWord={highlightWord} />
@@ -209,10 +209,10 @@ export const Scene = ({ projects }: SceneProps) => {
 
         {/* Overlay Narrative Texts (Outside 3D context to guarantee top Z-index) */}
         <div className="absolute inset-0 pointer-events-none z-[100]">
-          <NarrativeText alignClass="top-0 left-0 items-start" textAlign="text-left" text="I've seen through a lens since I was little." scrollYProgress={smoothScroll} start={0.1} end={0.28} highlightWord="lens" />
-          <NarrativeText alignClass="top-0 right-0 items-end" textAlign="text-right" text="Now, AI expands what's possible." scrollYProgress={smoothScroll} start={0.32} end={0.5} highlightWord="possible" />
-          <NarrativeText alignClass="bottom-0 left-0 items-start" textAlign="text-left" text="We iterate faster and push boundaries." scrollYProgress={smoothScroll} start={0.54} end={0.72} highlightWord="boundaries" />
-          <NarrativeText alignClass="bottom-0 right-0 items-end" textAlign="text-right" text="But the human eye defines the vision." scrollYProgress={smoothScroll} start={0.76} end={0.95} highlightWord="vision" />
+          <NarrativeText alignClass="top-[15vh] left-[8vw] md:left-[15vw] items-start" textAlign="text-left" text="I've seen through a lens since I was little." scrollYProgress={smoothScroll} start={0.1} end={0.28} highlightWord="lens" />
+          <NarrativeText alignClass="top-[25vh] right-[8vw] md:right-[15vw] items-end" textAlign="text-right" text="Now, AI expands what's possible." scrollYProgress={smoothScroll} start={0.32} end={0.5} highlightWord="possible" />
+          <NarrativeText alignClass="bottom-[25vh] left-[8vw] md:left-[15vw] items-start" textAlign="text-left" text="We iterate faster and push boundaries." scrollYProgress={smoothScroll} start={0.54} end={0.72} highlightWord="boundaries" />
+          <NarrativeText alignClass="bottom-[15vh] right-[8vw] md:right-[15vw] items-end" textAlign="text-right" text="But the human eye defines the vision." scrollYProgress={smoothScroll} start={0.76} end={0.95} highlightWord="vision" />
         </div>
       </div>
     </div>
