@@ -7,7 +7,7 @@ import { useCanvasAnimation } from '../hooks/useParticles';
 
 // ─── Word-by-Word Reveal ─────────────────────────────────────────────────────
 
-const WordReveal: React.FC<{
+export const WordReveal: React.FC<{
   text: string;
   progress: number;
   className?: string;

@@ -1,6 +1,7 @@
 import React, { useRef, useMemo, useState, useEffect } from 'react';
 import { motion, useScroll, useTransform, useSpring, MotionValue, useVelocity } from 'framer-motion';
 import { useCanvasAnimation } from '../../hooks/useParticles';
+import { WordReveal } from '../Manifesto';
 
 export interface GalleryProject {
   id: string;
@@ -13,6 +14,34 @@ export interface GalleryProject {
 interface SceneProps {
   projects: GalleryProject[];
 }
+
+const NarrativeText = ({ text, scrollYProgress, start, end, highlightWord, alignClass, textAlign }: {text: string, scrollYProgress: MotionValue<number>, start: number, end: number, highlightWord?: string, alignClass: string, textAlign: string}) => {
+  const opacity = useTransform(
+    scrollYProgress, 
+    [start, start + 0.05, end - 0.05, end], 
+    [0, 1, 1, 0]
+  );
+  
+  const [wordProgress, setWordProgress] = useState(0);
+  useEffect(() => {
+    return scrollYProgress.on('change', (val) => {
+      if (val < start) setWordProgress(0);
+      else if (val > start + 0.1) setWordProgress(1);
+      else setWordProgress((val - start) / 0.1);
+    });
+  }, [scrollYProgress, start]);
+
+  return (
+    <motion.div
+      style={{ opacity }}
+      className={`absolute ${alignClass} flex flex-col pointer-events-none p-12 md:p-32 max-w-[90vw] md:max-w-4xl`}
+    >
+      <h2 className={`font-serif text-36 md:text-56 lg:text-[76px] font-medium tracking-tight ${textAlign} leading-[1.05] text-white mix-blend-difference drop-shadow-[0_4px_30px_rgba(0,0,0,0.8)]`}>
+        <WordReveal text={text} progress={wordProgress} highlightWord={highlightWord} />
+      </h2>
+    </motion.div>
+  );
+};
 
 // Helper to generate random positions but keep them deterministic based on index
 const getRandomPos = (index: number) => {
@@ -176,6 +205,14 @@ export const Scene = ({ projects }: SceneProps) => {
                totalItems={projects.length}
              />
            ))}
+        </div>
+
+        {/* Overlay Narrative Texts (Outside 3D context to guarantee top Z-index) */}
+        <div className="absolute inset-0 pointer-events-none z-[100]">
+          <NarrativeText alignClass="top-0 left-0 items-start" textAlign="text-left" text="I've seen through a lens since I was little." scrollYProgress={smoothScroll} start={0.1} end={0.28} highlightWord="lens" />
+          <NarrativeText alignClass="top-0 right-0 items-end" textAlign="text-right" text="Now, AI expands what's possible." scrollYProgress={smoothScroll} start={0.32} end={0.5} highlightWord="possible" />
+          <NarrativeText alignClass="bottom-0 left-0 items-start" textAlign="text-left" text="We iterate faster and push boundaries." scrollYProgress={smoothScroll} start={0.54} end={0.72} highlightWord="boundaries" />
+          <NarrativeText alignClass="bottom-0 right-0 items-end" textAlign="text-right" text="But the human eye defines the vision." scrollYProgress={smoothScroll} start={0.76} end={0.95} highlightWord="vision" />
         </div>
       </div>
     </div>
