@@ -2,7 +2,10 @@
 
 > **Project**: Daniel Granda's personal portfolio website
 > **Purpose**: Job-seeking portfolio showcasing video production, AI systems, and creative technology
-> **Status**: Active development — React/Vite SPA with cinematic animations
+> **Status**: Deployed & live at https://daniel-granda.com — Full-stack (React + Express + PostgreSQL)
+> **API**: https://api.daniel-granda.com
+> **VPS**: 31.97.65.93 (Hostinger KVM 2, Ubuntu 24.04)
+> **GitHub**: https://github.com/dgranda1609/daniel-granda
 > **Inherits from**: `D:\Development Tools\CLAUDE.md` (global agents, MCP servers, skills)
 
 ---
@@ -25,7 +28,7 @@ The site positions Daniel as a **cinematic video producer and AI-first creative 
 **Portfolio**: daniel-granda.com / dgrandastudio.com
 
 ### Professional Identity
-- 10+ years in video production, motion graphics, and editorial storytelling
+- 15+ years in video production, motion graphics, and editorial storytelling
 - Currently Lead Video & Media Producer at **Kreyol Essence** (Shark Tank winner, Black Ambition 2024 & Beauty Matter 2025 Finalist) — producing 100+ assets/month
 - Award-winning documentary work: **Cannes World Film Festival finalist**, 10+ festival selections, Impact Doc Awards winner
 - Clients include **Microsoft**, **The North Face**, **United Nations/ILO**, **America Television/TELEFE**
@@ -61,24 +64,39 @@ The site positions Daniel as a **cinematic video producer and AI-first creative 
 
 ## Tech Stack
 
-### Frontend (Current)
+### Frontend
 | Technology | Version | Purpose |
 |------------|---------|---------|
 | React | 19.2.4 | UI framework |
 | TypeScript | 5.8.2 | Type safety |
-| Vite | 6.2.0 | Build tool & dev server |
+| Vite | 6.4.1 | Build tool & dev server |
+| React Query | @tanstack/react-query | API data fetching & caching |
+| React Router | react-router-dom | SPA routing (Home, CaseStudy, Articles) |
 | Framer Motion | 12.33.0 | Animations & transitions |
 | Matter.js | 0.20.0 | Physics-based tag animations |
 | Lucide React | 0.563.0 | Icons |
 | Tailwind CSS | CDN | Utility-first styling |
 
-### Backend (Planned)
-- No backend currently — static SPA
-- Future: Node.js/Express or serverless functions for:
-  - Blog/article RSS feed aggregation
-  - Contact form processing
-  - Analytics dashboard
-  - CMS-lite for project data
+### Backend (Deployed)
+| Technology | Version | Purpose |
+|------------|---------|---------|
+| Express.js | — | HTTP server & REST API |
+| TypeScript | — | Type safety |
+| PostgreSQL | 16 | Database (raw `pg` driver, no ORM) |
+| Zod | — | Request validation |
+| Resend | — | Transactional email (contact form) |
+| PM2 | 5.4.3 | Process manager with auto-restart |
+| Caddy | 2.10.2 | Reverse proxy + auto-SSL (Let's Encrypt) |
+
+### Frontend → Backend Integration
+| Layer | File | Purpose |
+|-------|------|---------|
+| API Client | `lib/api.ts` | Fetch wrapper with error handling, extracts `data` from `{success, data}` response format |
+| Case Conversion | `lib/caseConversion.ts` | Recursive `snakeToCamel()` / `camelToSnake()` — API returns snake_case, frontend uses camelCase |
+| React Query Hooks | `lib/hooks/useApi.ts` | `useProjects()`, `useClients()`, `useTestimonials()` hooks with cache keys |
+| Environment | `.env.local` | `VITE_API_URL=https://api.daniel-granda.com/api` |
+
+**Key pattern:** API responses are `{ success: true, data: [...] }`. The API client extracts `data` before passing to components. All snake_case keys are converted to camelCase automatically.
 
 ### Fonts
 | Font | Role | Weights |
@@ -111,77 +129,117 @@ The site positions Daniel as a **cinematic video producer and AI-first creative 
 ## Project Structure
 
 ```
-personal-portfolio/
+daniel-granda-portfolio-prefinalversion/   # Project root
 ├── CLAUDE.md                              # THIS FILE
-├── daniel-rodrigo-portfolio/              # Main React application
-│   ├── public/images/                     # Optimized project imagery
-│   ├── components/                        # React components (11 files)
-│   │   ├── Navbar.tsx                     # Fixed glassmorphism nav with scroll effects
-│   │   ├── Hero.tsx                       # 300vh sticky scroll with expanding video
-│   │   ├── About.tsx                      # Portrait + skill ticker + bio
-│   │   ├── Projects.tsx                   # 5-card grid with 3D tilt hover
-│   │   ├── Services.tsx                   # Motion/AI/Branding with physics tags
-│   │   ├── Clients.tsx                    # 9-item grid with hover cards
-│   │   ├── Testimonials.tsx               # Infinite ticker carousel
-│   │   ├── SocialProof.tsx                # 5 expanding bubbles
-│   │   ├── Footer.tsx                     # Animated gradient + CTA
-│   │   ├── PhysicsTags.tsx                # Matter.js physics simulation
-│   │   └── AnimatedGradientBackground.tsx # Breathing radial gradient
-│   ├── App.tsx                            # Root component + IntersectionObserver
-│   ├── index.tsx                          # React entry point
-│   ├── types.ts                           # Project, Client, Testimonial interfaces
-│   ├── index.html                         # HTML template + Tailwind config + custom CSS
-│   ├── vite.config.ts                     # Vite config (port 3000)
-│   ├── tsconfig.json                      # TypeScript config
-│   └── package.json                       # Dependencies
+├── DEPLOYMENT.md                          # Full deployment guide
+├── package.json                           # Dependencies
+├── vite.config.ts                         # Vite config
+├── tsconfig.json                          # TypeScript config
+├── index.html                             # HTML template + Tailwind config + CSS
+├── index.tsx                              # React entry point
+├── App.tsx                                # Root component with React Router
+├── types.ts                               # Project, Client, Testimonial interfaces
+├── .env.local                             # VITE_API_URL (gitignored)
+│
+├── components/                            # React components (13 files)
+│   ├── Navbar.tsx                         # Fixed glassmorphism nav with scroll effects
+│   ├── Hero.tsx                           # 300vh sticky scroll with expanding video
+│   ├── About.tsx                          # Portrait + skill ticker + bio
+│   ├── Projects.tsx                       # 5-card grid with 3D tilt + API fetch
+│   ├── Services.tsx                       # Motion/AI/Branding with physics tags
+│   ├── Clients.tsx                        # 9-item grid with hover cards + API fetch
+│   ├── Testimonials.tsx                   # Infinite ticker carousel + API fetch
+│   ├── SocialProof.tsx                    # 5 expanding bubbles
+│   ├── Manifesto.tsx                      # Brand manifesto with scroll phases
+│   ├── Footer.tsx                         # Animated gradient + CTA
+│   ├── ContactModal.tsx                   # Contact form modal
+│   ├── PhysicsTags.tsx                    # Matter.js physics simulation
+│   └── AnimatedGradientBackground.tsx     # Breathing radial gradient
+│
+├── pages/                                 # Route pages
+│   ├── Home.tsx                           # Main page (all sections + MutationObserver for reveals)
+│   ├── CaseStudy.tsx                      # Individual project detail page (/work/:slug)
+│   └── Articles.tsx                       # Blog/articles feed page
+│
+├── lib/                                   # Utilities & API layer
+│   ├── api.ts                             # ApiClient class — fetch, error handling, response extraction
+│   ├── caseConversion.ts                  # snake_case ↔ camelCase recursive converters
+│   └── hooks/
+│       └── useApi.ts                      # React Query hooks (useProjects, useClients, etc.)
+│
+├── src/                                   # Alternate source (legacy, may have duplicates)
+│   ├── pages/Home.tsx
+│   └── vite-env.d.ts                      # Vite env type declarations
+│
+├── public/images/                         # Static images (copied to dist/ on build)
+│   ├── ILO-hero.gif                       # ILO Documentary project hero
+│   ├── dinamo-hero.gif                    # Dinamo Zagreb project hero
+│   ├── miami-weddings-hero.gif            # Miami Weddings project hero
+│   ├── alternative-audiovisual-hero.jpg   # Alt Audiovisual project hero
+│   ├── kreyolessence-3x4-img-1.jpg       # Kreyol Essence project hero
+│   ├── me-portrait-red.png                # Portrait for About section
+│   ├── me-redbg-v*.webp                   # Optimized portrait variants
+│   └── *-hero.webp                        # Service section heroes
+│
+├── backend/                               # Express.js + TypeScript API
+│   ├── src/
+│   │   ├── index.ts                       # Server entry point (port 4000)
+│   │   ├── config/
+│   │   │   ├── cors.ts                    # CORS config (splits comma-separated origins)
+│   │   │   └── database.ts               # PostgreSQL connection pool
+│   │   ├── routes/                        # API route handlers
+│   │   ├── middleware/                     # Auth, rate limiting, validation
+│   │   └── schemas/                       # Zod validation schemas
+│   ├── migrations/                        # SQL migration files
+│   ├── seeds/                             # Database seed data
+│   ├── .env                               # Backend env (gitignored)
+│   ├── package.json
+│   └── tsconfig.json
+│
+├── shared/                                # Shared types between frontend & backend
+├── content/                               # Blog/article content (markdown)
+├── deploy/                                # Deployment scripts
+│   └── vps-setup.sh                       # Initial VPS setup script
+│
+├── dist/                                  # Production build output (gitignored)
+│   ├── index.html
+│   ├── assets/index-*.js                  # Bundled JS
+│   └── images/                            # Copied from public/images/
 │
 ├── Assets for the portfolio/              # Raw design assets library
-│   ├── *.gif, *.jpg                       # Project hero images
-│   ├── kreyolessence-*.jpg                # 16+ KreyolEssence variations
-│   ├── me-portrait-red.png                # High-res portrait (11MB)
-│   ├── me-redbg-v*.webp                   # Optimized portrait variants
-│   └── *.mp4                              # Documentary/brand films (~600MB total)
-│
-├── Fonts/                                 # Custom font files
-│   └── tan-memories/                      # OTF + TTF formats
-│
-├── design-inspo/                          # Design reference screenshots (12 files)
-│   ├── hero-section-*.png                 # Hero scroll interaction references
-│   ├── branding-inspo.png                 # Color/type system reference (Griflan)
-│   ├── skills-section-*.png               # Service hover interaction reference
-│   ├── my-work-section-inspo.png          # Project grid reference
-│   └── final-section-CTA-inspo.png        # Footer CTA reference
-│
+├── Fonts/                                 # Custom font files (Tan Memories)
+├── design-inspo/                          # Design reference screenshots
 └── pdf-resumes/                           # Resume & application materials
-    ├── 2026_Daniel Granda_*.pdf           # Current resume versions (2 variants)
-    ├── Cover Letter_*.pdf                 # Cover letter template
-    ├── 2025-*/                            # Dated application folders
-    │   ├── resume_tailored.md             # Tailored resume markdown
-    │   ├── coverletter_tailored.md        # Tailored cover letter
-    │   └── job-description.md             # Source job description
-    ├── archived-applications/             # Older applications (8 PDFs)
-    └── Original ressume and cover letter/ # Base templates
 ```
 
 ---
 
 ## Component Architecture
 
-### Section Order (App.tsx)
-1. `<Navbar />` — Fixed, glassmorphism, scroll-reactive
+### Routes (App.tsx → React Router)
+| Path | Page | Description |
+|------|------|-------------|
+| `/` | `Home.tsx` | Main portfolio page (all sections below) |
+| `/work/:slug` | `CaseStudy.tsx` | Individual project detail page |
+| `/articles` | `Articles.tsx` | Blog/articles feed |
+
+### Section Order (Home.tsx)
+1. `<Navbar />` — Fixed, glassmorphism, scroll-reactive, contact button
 2. `<Hero />` — Sticky 300vh with expanding YouTube video
-3. `<About />` — Portrait with rotating skill ticker
-4. `<Projects />` — Grid with 3D tilt hover
-5. `<Services />` — Three categories with Matter.js physics tags
-6. `<Clients />` — Hover-reveal card grid
-7. `<Testimonials />` — Infinite horizontal ticker
-8. `<SocialProof />` — Expanding differentiator bubbles
-9. `<Footer />` — Breathing gradient + contact CTA
+3. `<Manifesto />` — Brand manifesto with scroll-driven word reveal
+4. `<About />` — Portrait with rotating skill ticker
+5. `<Projects />` — Grid with 3D tilt hover (**fetches from API**)
+6. `<Services />` — Three categories with Matter.js physics tags
+7. `<Clients />` — Hover-reveal card grid (**fetches from API**)
+8. `<Testimonials />` — Infinite horizontal ticker (**fetches from API**)
+9. `<SocialProof />` — Expanding differentiator bubbles
+10. `<Footer />` — Breathing gradient + contact CTA
+11. `<ContactModal />` — Contact form overlay
 
 ### Animation System
 | Technique | Implementation | Used In |
 |-----------|---------------|---------|
-| Scroll reveal | IntersectionObserver + CSS `.reveal` class | All sections |
+| Scroll reveal | IntersectionObserver + MutationObserver + CSS `.reveal`/`.active` | All sections |
 | Sticky scroll | CSS `position: sticky` with scroll progress | Hero |
 | Physics simulation | Matter.js engine (gravity, friction, bouncing) | Services tags |
 | 3D tilt on hover | Mouse-tracking `rotateX/Y` transforms | Project cards |
@@ -189,17 +247,34 @@ personal-portfolio/
 | Breathing gradient | Framer Motion opacity animation | Footer |
 | Glassmorphism | `backdrop-filter: blur(10px)` | Navbar |
 | Staggered entrance | Framer Motion `animate` with delays | SocialProof |
+| Scroll word reveal | Scroll progress phases (0-0.35, etc.) | Manifesto |
+
+**Important:** The `.reveal` system uses a MutationObserver (in `Home.tsx`) to detect dynamically-added elements (e.g., after API data loads). This ensures elements that render after initial page load still get observed and animated. Without the MutationObserver, API-fetched content stays invisible (`opacity: 0`).
 
 ---
 
 ## Development Commands
 
 ```bash
-# From daniel-rodrigo-portfolio/ directory:
+# Frontend (from project root: daniel-granda-portfolio-prefinalversion/)
 npm install          # Install dependencies
-npm run dev          # Start dev server (port 3000)
+npm run dev          # Start dev server (port 3002)
 npm run build        # Production build → dist/
 npm run preview      # Preview production build
+
+# Backend (from backend/ subdirectory)
+cd backend
+npm install          # Install dependencies
+npm run dev          # Start dev server with hot reload (port 4000)
+npm run build        # Compile TypeScript → dist/
+npm run migrate      # Run database migrations
+npm run seed         # Seed database with sample data
+
+# Deploy frontend to production (from project root)
+npm run build && scp -i ~/.ssh/hostinger_vps -r dist/* root@31.97.65.93:/var/www/daniel-granda.com/
+
+# Deploy backend to production (via SSH)
+ssh -i ~/.ssh/hostinger_vps root@31.97.65.93 "cd ~/daniel-granda/backend && git pull && npm ci --production && npm run build && pm2 restart portfolio-api --update-env"
 ```
 
 ---
@@ -314,32 +389,123 @@ The `design-inspo/` folder contains approved reference screenshots from the **Gr
 
 ---
 
+## Infrastructure & Deployment
+
+### Production Architecture
+```
+                         ┌─────────────────────────────────────────┐
+                         │     Hostinger VPS (31.97.65.93)         │
+                         │     Ubuntu 24.04 / KVM 2                │
+                         │                                         │
+  daniel-granda.com ────►│  Caddy (auto-SSL, gzip)                │
+  www.daniel-granda.com  │    ├── / → file_server                  │
+                         │    │   /var/www/daniel-granda.com/      │
+                         │    │   (index.html + assets/ + images/) │
+                         │    │   try_files → /index.html (SPA)    │
+                         │    │                                     │
+  api.daniel-granda.com ►│    └── reverse_proxy → localhost:4000   │
+                         │         PM2 → portfolio-api (Node.js)   │
+                         │         PostgreSQL 16 (portfolio_db)    │
+                         └─────────────────────────────────────────┘
+```
+
+### DNS Records (Hostinger DNS)
+| Name | Type | Value | Purpose |
+|------|------|-------|---------|
+| `@` | A | `31.97.65.93` | Root domain → VPS |
+| `@` | AAAA | `2a02:4780:2d:180f::1` | IPv6 → VPS |
+| `www` | CNAME | `daniel-granda.com` | www redirect |
+| `api` | A | `31.97.65.93` | API subdomain → VPS |
+| `@` | MX | `mx1/mx2.hostinger.com` | Email (Hostinger) |
+| Various | CNAME/TXT | — | DKIM, SPF, DMARC for email |
+
+### VPS File Layout
+```
+/var/www/daniel-granda.com/    # Frontend static files (served by Caddy)
+├── index.html
+├── assets/index-*.js
+└── images/
+
+~/daniel-granda/               # Project repo + working directory
+├── backend/                   # Backend source + dist
+│   ├── src/                   # TypeScript source
+│   ├── dist/                  # Compiled JS (PM2 runs this)
+│   ├── .env                   # Production env vars
+│   └── node_modules/
+└── frontend/                  # Staging area for frontend builds
+
+/etc/caddy/Caddyfile           # Caddy config (both sites)
+```
+
+### Backend Environment Variables (VPS: ~/daniel-granda/backend/.env)
+```
+NODE_ENV=production
+PORT=4000
+DATABASE_URL=postgresql://portfolio:PASSWORD@localhost:5432/portfolio_db
+API_KEY=f364dc0aa90e14c90ec2e221413ba77ee0bf8229600299f8c404e886a399d013
+CORS_ORIGIN=https://daniel-granda.com,http://localhost:3002
+RESEND_API_KEY=                # Optional — enables contact form emails
+CONTACT_EMAIL=contact@daniel-granda.com
+UPLOAD_DIR=uploads
+MAX_UPLOAD_SIZE_MB=10
+```
+
+### SSH Access
+```bash
+# SSH key at ~/.ssh/hostinger_vps (ed25519)
+ssh -i ~/.ssh/hostinger_vps root@31.97.65.93
+```
+
+### Deploy Frontend (from local machine)
+```bash
+cd "d:\Development Tools\Gemini-antigravity\personal-portfolio\daniel-granda-portfolio-prefinalversion"
+npm run build
+scp -i ~/.ssh/hostinger_vps -r dist/* root@31.97.65.93:/var/www/daniel-granda.com/
+```
+
+### Deploy Backend (on VPS)
+```bash
+ssh -i ~/.ssh/hostinger_vps root@31.97.65.93
+cd ~/daniel-granda/backend
+git pull
+npm ci --production
+npm run build
+npm run migrate          # If schema changed
+pm2 restart portfolio-api --update-env
+```
+
+### Key Services on VPS
+| Service | Manager | Command |
+|---------|---------|---------|
+| Caddy | systemd | `systemctl reload caddy` / `systemctl status caddy` |
+| Backend API | PM2 | `pm2 restart portfolio-api` / `pm2 logs portfolio-api` |
+| PostgreSQL | systemd | `systemctl status postgresql` |
+
+---
+
 ## Roadmap & Development Areas
 
-### Current State
-- Single-page React SPA with all major sections built
-- Animations and interactions working (scroll reveals, physics tags, 3D tilt, tickers)
-- Project data and testimonials are hardcoded with some placeholder content
-- No backend, no routing, no blog/article feed
-- No deployment pipeline configured
-- Services section uses placeholder images (picsum.photos)
+### Current State (February 2026)
+- Full-stack deployed: React SPA + Express API + PostgreSQL
+- Frontend served from VPS via Caddy with auto-SSL
+- Backend API live at api.daniel-granda.com
+- Projects, Clients, Testimonials fetched from API (with fallback to hardcoded data)
+- SPA routing: Home (`/`), Case Study (`/work/:slug`), Articles (`/articles`)
+- All animations working (scroll reveals via IntersectionObserver + MutationObserver, physics tags, 3D tilt, tickers)
+- Contact form backend ready (needs RESEND_API_KEY for email delivery)
+- Admin API endpoints available for content management via API key
 
 ### Priority Improvements
-1. **Replace placeholder content** — Real client names, testimonial quotes, service images
-2. **Optimize assets** — The 11MB portrait PNG needs optimization; consolidate GIF/JPG duplicates
-3. **SEO & Meta** — OG tags, structured data, sitemap, proper meta descriptions
-4. **Performance** — Move Tailwind from CDN to build-time; tree-shake unused CSS
-5. **Deployment** — Set up CI/CD (Vercel, Netlify, or Hostinger VPS)
-6. **Contact form** — Functional email integration (Resend, EmailJS, or serverless function)
-7. **Analytics** — Privacy-respecting analytics (Plausible, Umami, or simple custom)
+1. **SEO & Meta** — OG tags, structured data, sitemap, proper meta descriptions
+2. **Performance** — Move Tailwind from CDN to build-time; tree-shake unused CSS
+3. **Contact form email** — Configure RESEND_API_KEY for actual email delivery
+4. **Analytics** — Privacy-respecting analytics (Plausible, Umami, or simple custom)
+5. **Case Study pages** — Deep-dive content for each project (currently route exists but needs content)
 
 ### Future Features
-- **Blog/Article Feed** — CSS grid card layout, curated web articles + original writing
-- **Backend API** — Project data CMS, article aggregation, contact form processing
-- **Case Study Pages** — Deep-dive project pages with scroll-driven storytelling
-- **Video Showreel** — Self-hosted or Vimeo-embedded, not YouTube
+- **Blog/Article Feed** — Content already supported by backend API + content/ directory
+- **Video Showreel** — Self-hosted or Vimeo-embedded
 - **Resume Download** — Direct PDF download from the site
-- **Dark/Light Mode** — Toggle (though dark-first is the brand)
 - **Internationalization** — EN/ES bilingual support
 
 ---

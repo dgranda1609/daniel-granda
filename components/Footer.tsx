@@ -1,12 +1,18 @@
 
 import React from 'react';
 import AnimatedGradientBackground from './AnimatedGradientBackground';
+import type { Theme } from '../lib/useTheme';
 
 interface FooterProps {
   onContactClick: () => void;
+  theme: Theme;
 }
 
-export const Footer: React.FC<FooterProps> = ({ onContactClick }) => {
+export const Footer: React.FC<FooterProps> = ({ onContactClick, theme }) => {
+  const gradientColors = theme === 'light'
+    ? ['#FF3831', '#FF5A54', '#FF3831', '#E8E6E1', '#F0EEE9', '#F5F3EE', '#F5F3EE']
+    : ['#FF3831', '#FF5A54', '#FF3831', '#2A1A1A', '#1A1A1A', '#0F0F0F', '#0F0F0F'];
+
   return (
     <footer className="relative py-128 px-24 md:px-64 bg-brand-bg overflow-hidden">
       {/* Animated Gradient Background */}
@@ -16,6 +22,7 @@ export const Footer: React.FC<FooterProps> = ({ onContactClick }) => {
         breathingRange={8}
         animationSpeed={0.03}
         topOffset={30}
+        gradientColors={gradientColors}
       />
 
       <div className="relative z-10 text-center max-w-4xl mx-auto mb-128 reveal">

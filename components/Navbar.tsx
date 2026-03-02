@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { ThemeToggle } from './ThemeToggle';
+import type { Theme } from '../lib/useTheme';
 
 interface NavbarProps {
   onContactClick: () => void;
+  theme: Theme;
+  onThemeToggle: () => void;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ onContactClick }) => {
+export const Navbar: React.FC<NavbarProps> = ({ onContactClick, theme, onThemeToggle }) => {
   const location = useLocation();
   const [opacity, setOpacity] = useState(1);
   const [blur, setBlur] = useState(0);
@@ -42,9 +46,11 @@ export const Navbar: React.FC<NavbarProps> = ({ onContactClick }) => {
         opacity: opacity,
         transform: `translateY(-${translateY}px)`,
         backdropFilter: `blur(${blur}px) saturate(180%)`,
-        background: `rgba(15, 15, 15, ${bgAlpha})`,
+        // @ts-ignore - CSS custom property
+        '--nav-alpha': bgAlpha,
+        background: 'var(--color-navbar-bg)',
         pointerEvents: opacity < 0.1 ? 'none' : 'auto',
-      }}
+      } as React.CSSProperties}
     >
       {/* Left Navigation */}
       <div className="flex flex-col gap-2 text-11 font-medium tracking-tight">
@@ -61,6 +67,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onContactClick }) => {
 
       {/* Right Actions */}
       <div className="flex items-center gap-24">
+        <ThemeToggle theme={theme} onToggle={onThemeToggle} />
         <button onClick={onContactClick} className="hidden md:block text-13 border-b border-brand-accent text-brand-accent hover:opacity-80 transition-opacity bg-transparent cursor-pointer">
           Let's Talk
         </button>

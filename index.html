@@ -17,11 +17,11 @@
         extend: {
           colors: {
             brand: {
-              primary: '#FFFDDB',
+              primary: 'var(--color-primary)',
               accent: '#FF3831',
-              bg: '#140c0c',
-              secondary: '#3F3F46',
-              text: '#FFFDDB',
+              bg: 'var(--color-bg)',
+              secondary: 'var(--color-secondary)',
+              text: 'var(--color-primary)',
             }
           },
           fontFamily: {
@@ -56,11 +56,36 @@
     }
   </script>
   <style>
+    /* ─── Theme Variables ─────────────────────────────────────── */
+    :root {
+      --color-primary: #FFFDDB;
+      --color-bg: #140c0c;
+      --color-secondary: #3F3F46;
+      --color-surface: #0F0F0F;
+      --color-glass-bg: rgba(15, 15, 15, 0.7);
+      --color-glass-border: rgba(255, 253, 219, 0.05);
+      --color-navbar-bg: rgba(15, 15, 15, var(--nav-alpha, 0));
+      --color-modal-bg: rgba(20, 12, 12, 0.85);
+      --grain-opacity: 0.08;
+    }
+
+    :root.light {
+      --color-primary: #1A1A1A;
+      --color-bg: #F5F3EE;
+      --color-secondary: #A0A0A0;
+      --color-surface: #EAE8E3;
+      --color-glass-bg: rgba(245, 243, 238, 0.8);
+      --color-glass-border: rgba(26, 26, 26, 0.08);
+      --color-navbar-bg: rgba(245, 243, 238, var(--nav-alpha, 0));
+      --color-modal-bg: rgba(245, 243, 238, 0.92);
+      --grain-opacity: 0.04;
+    }
+
     body {
-      background-color: #140c0c;
-      color: #FFFDDB;
-      overflow-x: hidden;
+      background-color: var(--color-bg);
+      color: var(--color-primary);
       -webkit-font-smoothing: antialiased;
+      transition: background-color 400ms ease, color 400ms ease;
     }
 
     .reveal {
@@ -74,10 +99,18 @@
       transform: translateY(0);
     }
 
+    .perspective-container {
+      perspective: 1000px;
+    }
+
+    .preserve-3d {
+      transform-style: preserve-3d;
+    }
+
     .glass {
       backdrop-filter: blur(10px) saturate(180%);
-      background: rgba(15, 15, 15, 0.7);
-      border-bottom: 1px solid rgba(255, 253, 219, 0.05);
+      background: var(--color-glass-bg);
+      border-bottom: 1px solid var(--color-glass-border);
     }
 
     ::-webkit-scrollbar {
@@ -85,11 +118,11 @@
     }
 
     ::-webkit-scrollbar-track {
-      background: #140c0c;
+      background: var(--color-bg);
     }
 
     ::-webkit-scrollbar-thumb {
-      background: #3F3F46;
+      background: var(--color-secondary);
       border-radius: 3px;
     }
 
@@ -116,7 +149,7 @@
       left: -100%;
       width: 300%;
       height: 300%;
-      opacity: 0.08;
+      opacity: var(--grain-opacity);
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.5' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
       animation: grain 8s steps(10) infinite;
     }

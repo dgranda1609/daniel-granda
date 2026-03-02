@@ -1,7 +1,9 @@
 
 import React, { useState } from 'react';
+import { useClients } from '../lib/hooks/useApi';
 
-const CLIENTS = [
+// Fallback data
+const FALLBACK_CLIENTS = [
   { name: "United Nations / ILO", category: "Documentary" },
   { name: "Microsoft", category: "Brand Film" },
   { name: "The North Face", category: "Video Production" },
@@ -64,6 +66,21 @@ const ClientItem: React.FC<{ client: { name: string; category: string } }> = ({ 
 };
 
 export const Clients: React.FC = () => {
+  // Fetch clients from API
+  const { data: apiClients, isLoading, error } = useClients();
+
+  // Map API data to component format, fallback on error
+  const clients = React.useMemo(() => {
+    if (!apiClients || error) {
+      return FALLBACK_CLIENTS;
+    }
+    return apiClients.map((c: any) => ({
+      name: c.name,
+      category: c.category,
+      description: c.description
+    }));
+  }, [apiClients, error]);
+
   return (
     <section className="py-64 px-24 md:px-64 bg-brand-bg relative z-0">
       <div className="max-w-[1920px] mx-auto border-t border-brand-primary/10">
@@ -76,15 +93,22 @@ export const Clients: React.FC = () => {
             </h2>
           </div>
 
-          {/* Right Grid Area - Note: overflow-visible allowed to let cards float out */}
+          {/* Right Grid Area */}
           <div className="lg:w-2/3 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 border-r border-brand-primary/10 reveal relative">
-            {CLIENTS.map((client) => (
-              <ClientItem key={client.name} client={client} />
-            ))}
-
-            {/* Fillers for grid completeness */}
-            <div className="hidden xl:block border-b md:border-l border-brand-primary/10"></div>
-            <div className="hidden xl:block border-b md:border-l border-brand-primary/10"></div>
+            {isLoading ? (
+              <div className="col-span-full flex justify-center items-center py-64">
+                <div className="text-brand-primary/40">Loading clients...</div>
+              </div>
+            ) : (
+              <>
+                {clients.map((client: any) => (
+                  <ClientItem key={client.name} client={client} />
+                ))}
+                {/* Fillers for grid completeness */}
+                <div className="hidden xl:block border-b md:border-l border-brand-primary/10"></div>
+                <div className="hidden xl:block border-b md:border-l border-brand-primary/10"></div>
+              </>
+            )}
           </div>
 
         </div>

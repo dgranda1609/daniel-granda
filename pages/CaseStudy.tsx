@@ -7,10 +7,12 @@ import { Navbar } from '../components/Navbar';
 import { Footer } from '../components/Footer';
 import { ContactModal } from '../components/ContactModal';
 import { ArrowLeft } from 'lucide-react';
+import { useTheme } from '../lib/useTheme';
 
 export const CaseStudy: React.FC = () => {
     const { slug } = useParams<{ slug: string }>();
     const [isContactOpen, setIsContactOpen] = useState(false);
+    const { theme, toggle: toggleTheme } = useTheme();
 
     const { data: project, isLoading } = useQuery({
         queryKey: ['project', slug],
@@ -38,7 +40,7 @@ export const CaseStudy: React.FC = () => {
         <div className="min-h-screen bg-brand-bg text-brand-primary font-body selection:bg-brand-accent selection:text-brand-primary">
             <div className="film-grain" />
 
-            <Navbar onContactClick={() => setIsContactOpen(true)} />
+            <Navbar onContactClick={() => setIsContactOpen(true)} theme={theme} onThemeToggle={toggleTheme} />
 
             {/* HERO SECTION - Blurred BG + Big Bold Text */}
             <header className="relative w-full h-screen flex items-center justify-center overflow-hidden">
@@ -80,7 +82,7 @@ export const CaseStudy: React.FC = () => {
                 <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-24">
                     {project.images && project.images.length > 0 ? (
                         project.images.slice(0, 3).map((img: string, index: number) => (
-                            <div key={index} className={`relative aspect-[3/4] overflow-hidden rounded-lg border border-white/5`}>
+                            <div key={index} className={`relative aspect-[3/4] overflow-hidden rounded-lg border border-brand-primary/10`}>
                                 <img
                                     src={img}
                                     alt={`Gallery ${index + 1}`}
@@ -91,7 +93,7 @@ export const CaseStudy: React.FC = () => {
                     ) : (
                         // Fallback if images array is empty (use main image 3 times or placeholders)
                         [1, 2, 3].map((_, i) => (
-                            <div key={i} className="relative aspect-[3/4] overflow-hidden rounded-lg border border-white/5 bg-white/5">
+                            <div key={i} className="relative aspect-[3/4] overflow-hidden rounded-lg border border-brand-primary/10 bg-brand-primary/5">
                                 <img src={project.image_url} alt="" className="w-full h-full object-cover opacity-50 grayscale hover:grayscale-0 transition-all" />
                             </div>
                         ))
@@ -108,7 +110,7 @@ export const CaseStudy: React.FC = () => {
 
                     <div className="flex flex-wrap justify-center gap-4 mt-12">
                         {project.tags.map((tag: string) => (
-                            <span key={tag} className="border border-white/10 px-4 py-2 rounded-full text-xs uppercase tracking-widest text-brand-primary/60">
+                            <span key={tag} className="border border-brand-primary/10 px-4 py-2 rounded-full text-xs uppercase tracking-widest text-brand-primary/60">
                                 {tag}
                             </span>
                         ))}
@@ -117,7 +119,7 @@ export const CaseStudy: React.FC = () => {
 
             </main>
 
-            <Footer onContactClick={() => setIsContactOpen(true)} />
+            <Footer onContactClick={() => setIsContactOpen(true)} theme={theme} />
             <ContactModal isOpen={isContactOpen} onClose={() => setIsContactOpen(false)} />
         </div>
     );

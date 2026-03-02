@@ -1,8 +1,11 @@
 
 import React from 'react';
 import { Quote } from 'lucide-react';
+import { useTestimonials } from '../lib/hooks/useApi';
+import type { Theme } from '../lib/useTheme';
 
-const TESTIMONIALS = [
+// Fallback data
+const FALLBACK_TESTIMONIALS = [
   {
     text: "Daniel's video work completely reframed how we present our product. Every frame feels intentional — the storytelling is sharp and the production quality is top-tier.",
     author: "Marketing Director",
@@ -46,10 +49,10 @@ const TestimonialCard: React.FC<{ testimonial: any; index: number }> = ({ testim
   const rotation = rotations[index % rotations.length];
 
   const isAccent = testimonial.color === 'accent';
-  const bgColor = isAccent ? 'bg-[#FF3831] text-[#FFFDDB]' : 'bg-[#FFFDDB] text-[#FF3831]';
-  const quoteColor = isAccent ? 'text-[#FFFDDB]/20' : 'text-[#FF3831]/20';
+  const bgColor = isAccent ? 'bg-brand-accent text-brand-bg' : 'bg-brand-primary text-brand-accent';
+  const quoteColor = isAccent ? 'text-brand-bg/20' : 'text-brand-accent/20';
   const glowShadow = isAccent
-    ? 'hover:shadow-[0_0_50px_12px_rgba(255,253,219,0.25)]'
+    ? 'hover:shadow-[0_0_50px_12px_rgba(255,56,49,0.25)]'
     : 'hover:shadow-[0_0_50px_12px_rgba(255,56,49,0.35)]';
 
   return (
@@ -75,14 +78,34 @@ const TestimonialCard: React.FC<{ testimonial: any; index: number }> = ({ testim
   );
 };
 
-export const Testimonials: React.FC = () => {
+interface TestimonialsProps {
+  theme: Theme;
+}
+
+export const Testimonials: React.FC<TestimonialsProps> = ({ theme }) => {
+  // Fetch testimonials from API
+  const { data: apiTestimonials, error } = useTestimonials();
+
+  // Map API data to component format, fallback on error
+  const testimonials = React.useMemo(() => {
+    if (!apiTestimonials || error) {
+      return FALLBACK_TESTIMONIALS;
+    }
+    return apiTestimonials.map((t: any) => ({
+      text: t.text,
+      author: t.author,
+      role: t.role,
+      color: t.color
+    }));
+  }, [apiTestimonials, error]);
+
   // Triple the data to ensure the ticker never gaps even on large screens
-  const fullRow = [...TESTIMONIALS, ...TESTIMONIALS, ...TESTIMONIALS];
+  const fullRow = [...testimonials, ...testimonials, ...testimonials];
 
   return (
-    <section className="py-64 md:py-128 bg-[#0F0F0F] overflow-hidden relative">
+    <section className="py-64 md:py-128 overflow-hidden relative" style={{ backgroundColor: 'var(--color-surface)' }}>
       <div className="text-center mb-16 px-24 reveal">
-        <h2 className="font-serif text-56 md:text-80 lg:text-[110px] xl:text-[120px] leading-[0.85] font-semibold tracking-tighter text-[#FFFDDB]">
+        <h2 className="font-serif text-56 md:text-80 lg:text-[110px] xl:text-[120px] leading-[0.85] font-semibold tracking-tighter text-brand-primary">
           What they say.
         </h2>
       </div>
@@ -104,8 +127,8 @@ export const Testimonials: React.FC = () => {
         </div>
 
         {/* Edge Fades for visual depth */}
-        <div className="absolute inset-y-0 left-0 w-32 md:w-200 bg-gradient-to-r from-[#0F0F0F] via-[#0F0F0F]/40 to-transparent z-30 pointer-events-none"></div>
-        <div className="absolute inset-y-0 right-0 w-32 md:w-200 bg-gradient-to-l from-[#0F0F0F] via-[#0F0F0F]/40 to-transparent z-30 pointer-events-none"></div>
+        <div className="absolute inset-y-0 left-0 w-32 md:w-200 z-30 pointer-events-none" style={{ background: 'linear-gradient(to right, var(--color-surface), var(--color-surface) 20%, transparent)' }}></div>
+        <div className="absolute inset-y-0 right-0 w-32 md:w-200 z-30 pointer-events-none" style={{ background: 'linear-gradient(to left, var(--color-surface), var(--color-surface) 20%, transparent)' }}></div>
       </div>
     </section>
   );

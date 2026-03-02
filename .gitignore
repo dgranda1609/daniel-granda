@@ -59,3 +59,4 @@ coverage
 *.tmp
 .cache
 .parcel-cache
+*tar.gz

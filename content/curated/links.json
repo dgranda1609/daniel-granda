@@ -1,1 +1,34 @@
-[]
+[
+  {
+    "title": "Eight Trends Defining How Software Gets Built in 2026",
+    "url": "https://claude.com/blog/eight-trends-defining-how-software-gets-built-in-2026",
+    "source": "Anthropic / Claude Blog",
+    "excerpt": "Anthropic's breakdown of the 8 structural shifts reshaping how software is built this year — from AI-native tooling to the collapse of the design-to-dev handoff.",
+    "category": "Development & AI",
+    "tags": ["ai-development", "claude", "2026-trends", "software-engineering"]
+  },
+  {
+    "title": "OpenAI's OpenClaw Hire Signals a New Phase in the AI Agent Race",
+    "url": "https://fortune.com/2026/02/17/what-openais-openclaw-hire-says-about-the-future-of-ai-agents/",
+    "source": "Fortune",
+    "excerpt": "Peter Steinberger joining OpenAI with OpenClaw changes the competitive landscape for AI agents. Fortune's analysis of what the move signals for the next 18 months.",
+    "category": "AI Workflow",
+    "tags": ["openclaw", "ai-agents", "openai", "industry-news"]
+  },
+  {
+    "title": "Sora 2 and Runway Gen-4 Solve AI Video's Biggest Problem",
+    "url": "https://studio.aifilms.ai/blog/sora-2-runway-gen-4-solve-jitter-problem-2026",
+    "source": "AI Films Studio",
+    "excerpt": "Deep technical analysis of how temporal consistency was solved — and what the Sundance 2026 AI film premieres actually mean for professional video production.",
+    "category": "Video Production",
+    "tags": ["ai-video", "sora", "runway", "post-production", "temporal-consistency"]
+  },
+  {
+    "title": "From Claude Code to Figma: Turning Production Code into Editable Figma Designs",
+    "url": "https://www.figma.com/blog/introducing-claude-code-to-figma/",
+    "source": "Figma Blog",
+    "excerpt": "How the Claude Code → Figma MCP integration inverts the traditional design-to-dev handoff. Build in code first, generate Figma layers from the rendered state.",
+    "category": "Design & AI",
+    "tags": ["figma", "claude", "design-systems", "workflow", "mcp"]
+  }
+]

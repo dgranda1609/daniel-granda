@@ -7,6 +7,8 @@ import { Home } from './pages/Home';
 import { Articles } from './pages/Articles';
 import { CaseStudy } from './pages/CaseStudy';
 
+import { CaseStudyNoir } from './pages/CaseStudyNoir';
+
 const App: React.FC = () => {
   return (
     <QueryClientProvider client={queryClient}>
@@ -15,6 +17,7 @@ const App: React.FC = () => {
           <Route path="/" element={<Home />} />
           <Route path="/articles" element={<Articles />} />
           <Route path="/work/:slug" element={<CaseStudy />} />
+          <Route path="/noir/:slug" element={<CaseStudyNoir />} />
         </Routes>
       </Router>
     </QueryClientProvider>

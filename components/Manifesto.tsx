@@ -1,220 +1,9 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
+import type { Theme } from '../lib/useTheme';
 
 // ─── Particle System for Lightspeed Tunnel ───────────────────────────────────
 
-interface Particle {
-  x: number;
-  y: number;
-  z: number;
-  prevX: number;
-  prevY: number;
-  speed: number;
-  color: string;
-  opacity: number;
-}
-
-const CREAM = '#FFFDDB';
-const RED = '#FF3831';
-const PARTICLE_COUNT = 120;
-const MOBILE_PARTICLE_COUNT = 50;
-
-function createParticle(width: number, height: number, progress: number): Particle {
-  const angle = Math.random() * Math.PI * 2;
-  const radius = Math.random() * Math.max(width, height) * 0.6;
-  const cx = width / 2;
-  const cy = height / 2;
-
-  return {
-    x: cx + Math.cos(angle) * radius,
-    y: cy + Math.sin(angle) * radius,
-    z: Math.random() * 1000,
-    prevX: cx + Math.cos(angle) * radius,
-    prevY: cy + Math.sin(angle) * radius,
-    speed: 0.5 + Math.random() * 2,
-    color: Math.random() > 0.7 ? RED : CREAM,
-    opacity: 0.1 + Math.random() * 0.4,
-  };
-}
-
-function useCanvasAnimation(
-  canvasRef: React.RefObject<HTMLCanvasElement | null>,
-  progress: number
-) {
-  const particlesRef = useRef<Particle[]>([]);
-  const animFrameRef = useRef<number>(0);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    const resize = () => {
-      const dpr = window.devicePixelRatio || 1;
-      canvas.width = canvas.offsetWidth * dpr;
-      canvas.height = canvas.offsetHeight * dpr;
-      ctx.scale(dpr, dpr);
-    };
-    resize();
-    window.addEventListener('resize', resize);
-
-    // Initialize particles
-    const isMobile = window.innerWidth < 768;
-    const count = isMobile ? MOBILE_PARTICLE_COUNT : PARTICLE_COUNT;
-    if (particlesRef.current.length === 0) {
-      particlesRef.current = Array.from({ length: count }, () =>
-        createParticle(canvas.offsetWidth, canvas.offsetHeight, 0)
-      );
-    }
-
-    return () => {
-      window.removeEventListener('resize', resize);
-      if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
-    };
-  }, [canvasRef]);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    const w = canvas.offsetWidth;
-    const h = canvas.offsetHeight;
-    const cx = w / 2;
-    const cy = h / 2;
-
-    // Phase mapping
-    // 0-0.4: slow drift (setup)
-    // 0.4-0.7: acceleration into tunnel (the leap)
-    // 0.7-1.0: deceleration + dissolve (landing)
-
-    const speedMultiplier =
-      progress < 0.4
-        ? 0.3 + progress * 0.5
-        : progress < 0.7
-          ? 0.5 + (progress - 0.4) * 12
-          : 4.1 - (progress - 0.7) * 12;
-
-    const trailLength =
-      progress < 0.4
-        ? 0
-        : progress < 0.7
-          ? (progress - 0.4) * 3.33
-          : 1.0 - (progress - 0.7) * 2.5;
-
-    const globalAlpha =
-      progress < 0.4
-        ? 0.6
-        : progress < 0.7
-          ? 0.6 + (progress - 0.4) * 1.3
-          : 1.0 - (progress - 0.7) * 0.5;
-
-    // Clear with fade trail
-    ctx.globalAlpha = 1;
-    ctx.fillStyle = '#0F0F0F';
-    ctx.fillRect(0, 0, w, h);
-
-    const particles = particlesRef.current;
-
-    for (let i = 0; i < particles.length; i++) {
-      const p = particles[i];
-
-      p.prevX = p.x;
-      p.prevY = p.y;
-
-      // Move particles toward/away from center based on phase
-      const dx = p.x - cx;
-      const dy = p.y - cy;
-      const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-
-      if (progress < 0.4) {
-        // Slow drift — slight orbital motion
-        const angle = Math.atan2(dy, dx) + 0.002 * p.speed;
-        const newDist = dist + Math.sin(Date.now() * 0.001 + i) * 0.2;
-        p.x = cx + Math.cos(angle) * newDist;
-        p.y = cy + Math.sin(angle) * newDist;
-      } else if (progress < 0.7) {
-        // Converge toward center (tunnel effect)
-        const pullStrength = speedMultiplier * p.speed * 0.8;
-        p.x -= (dx / dist) * pullStrength;
-        p.y -= (dy / dist) * pullStrength;
-
-        // Respawn if too close to center
-        if (Math.abs(p.x - cx) < 5 && Math.abs(p.y - cy) < 5) {
-          const angle = Math.random() * Math.PI * 2;
-          const r = Math.max(w, h) * 0.5 + Math.random() * 100;
-          p.x = cx + Math.cos(angle) * r;
-          p.y = cy + Math.sin(angle) * r;
-          p.prevX = p.x;
-          p.prevY = p.y;
-        }
-      } else {
-        // Dissolve outward slowly
-        const pushStrength = Math.max(0.1, speedMultiplier) * p.speed * 0.3;
-        p.x += (dx / dist) * pushStrength;
-        p.y += (dy / dist) * pushStrength;
-        p.opacity = Math.max(0, p.opacity - 0.003);
-      }
-
-      // Draw
-      const particleAlpha = p.opacity * globalAlpha;
-      if (particleAlpha <= 0) continue;
-
-      ctx.globalAlpha = particleAlpha;
-
-      if (trailLength > 0.05) {
-        // Draw trail line
-        ctx.beginPath();
-        ctx.moveTo(p.prevX, p.prevY);
-        ctx.lineTo(p.x, p.y);
-        ctx.strokeStyle = p.color;
-        ctx.lineWidth = 1 + trailLength * 2;
-        ctx.stroke();
-
-        // Extended trail for peak effect
-        if (trailLength > 0.5) {
-          const trailDx = p.x - p.prevX;
-          const trailDy = p.y - p.prevY;
-          ctx.beginPath();
-          ctx.moveTo(p.x, p.y);
-          ctx.lineTo(p.x + trailDx * trailLength * 3, p.y + trailDy * trailLength * 3);
-          ctx.strokeStyle = p.color;
-          ctx.lineWidth = 0.5 + trailLength;
-          ctx.globalAlpha = particleAlpha * 0.3;
-          ctx.stroke();
-        }
-      } else {
-        // Draw dot
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, 1.5 + p.speed * 0.5, 0, Math.PI * 2);
-        ctx.fillStyle = p.color;
-        ctx.fill();
-      }
-    }
-
-    // Center glow during tunnel phase
-    if (progress > 0.35 && progress < 0.85) {
-      const glowIntensity =
-        progress < 0.55
-          ? (progress - 0.35) * 5
-          : progress < 0.7
-            ? 1
-            : 1 - (progress - 0.7) * 6.67;
-
-      const gradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, w * 0.3);
-      gradient.addColorStop(0, `rgba(255, 56, 49, ${0.15 * glowIntensity})`);
-      gradient.addColorStop(0.5, `rgba(255, 56, 49, ${0.05 * glowIntensity})`);
-      gradient.addColorStop(1, 'rgba(255, 56, 49, 0)');
-      ctx.globalAlpha = 1;
-      ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, w, h);
-    }
-
-    ctx.globalAlpha = 1;
-  }, [canvasRef, progress]);
-}
+import { useCanvasAnimation } from '../hooks/useParticles';
 
 // ─── Word-by-Word Reveal ─────────────────────────────────────────────────────
 
@@ -274,10 +63,17 @@ const PROJECT_STILLS = [
 
 // ─── Main Component ─────────────────────────────────────────────────────────
 
-export const Manifesto: React.FC = () => {
+interface ManifestoProps {
+  theme: Theme;
+}
+
+export const Manifesto: React.FC<ManifestoProps> = ({ theme }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [progress, setProgress] = useState(0);
+
+  const canvasBg = theme === 'light' ? '#EAE8E3' : '#0F0F0F';
+  const particleColor = theme === 'light' ? '#1A1A1A' : '#FFFDDB';
 
   useEffect(() => {
     const handleScroll = () => {
@@ -297,7 +93,7 @@ export const Manifesto: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  useCanvasAnimation(canvasRef, progress);
+  useCanvasAnimation(canvasRef, progress, canvasBg, particleColor);
 
   // Phase opacities
   const phase1Opacity = progress < 0.35 ? Math.min(1, progress * 4) : Math.max(0, 1 - (progress - 0.35) * 6);

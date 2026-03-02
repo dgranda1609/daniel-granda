@@ -1,540 +1,383 @@
-# Backend Deployment Guide
+# Deployment Guide — Daniel Granda Portfolio
 
-Complete guide to set up, test, and deploy the Portfolio Backend API.
-
----
-
-## Prerequisites
-
-- **Local (Windows):** Node.js 20+, PostgreSQL 16, Git
-- **VPS:** Ubuntu 24.04 server with root access (Hostinger VPS: 31.97.65.93)
-- **Domain:** daniel-granda.com (configured to point `api.daniel-granda.com` to VPS)
+Complete guide for deploying and maintaining the portfolio at https://daniel-granda.com
 
 ---
 
-## Phase 1: Local Setup & Testing (Windows)
+## Architecture Overview
 
-### 1.1 Install PostgreSQL 16
+Everything runs on a **single Hostinger VPS** (KVM 2):
 
-If not already installed:
-
-1. Download PostgreSQL 16 for Windows: https://www.postgresql.org/download/windows/
-2. Run installer, use default port `5432`
-3. Set a password for the `postgres` user (remember this!)
-4. Add PostgreSQL `bin` folder to PATH:
-   - Default: `C:\Program Files\PostgreSQL\16\bin`
-   - System Properties → Environment Variables → Path → Add
-
-5. Restart PowerShell/Terminal
-
-Verify installation:
-```powershell
-psql --version
-# Should show: psql (PostgreSQL) 16.x
 ```
-
-### 1.2 Run Setup Script
-
-Open PowerShell **as Administrator** in the backend directory:
-
-```powershell
-cd "d:\Development Tools\Gemini-antigravity\personal-portfolio\daniel-granda-portfolio-prefinalversion\backend"
-
-# Allow script execution (if needed)
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
-
-# Run setup
-.\setup-windows.ps1
+                         ┌─────────────────────────────────────────┐
+                         │     Hostinger VPS (31.97.65.93)         │
+                         │     Ubuntu 24.04 / KVM 2                │
+                         │     Node.js v24.13 / PostgreSQL 16      │
+                         │                                         │
+  daniel-granda.com ────►│  Caddy 2.10.2 (auto-SSL via Let's Encrypt)
+  www.daniel-granda.com  │    ├── / → file_server                  │
+                         │    │   /var/www/daniel-granda.com/      │
+                         │    │   SPA fallback: try_files → /index.html
+                         │    │                                     │
+  api.daniel-granda.com ►│    └── reverse_proxy → localhost:4000   │
+                         │         PM2 5.4.3 → portfolio-api       │
+                         │         PostgreSQL 16 (portfolio_db)    │
+                         └─────────────────────────────────────────┘
 ```
-
-This script will:
-- ✓ Check prerequisites (Node, PostgreSQL)
-- ✓ Create `.env` file with secure API key
-- ✓ Create PostgreSQL database `portfolio_db`
-- ✓ Install npm dependencies
-- ✓ Run migrations (create tables)
-- ✓ Seed database with sample data
-- ✓ Create uploads directory
-
-### 1.3 Start Development Server
-
-```powershell
-npm run dev
-```
-
-Server starts at: **http://localhost:4000**
-
-### 1.4 Test API Endpoints
-
-Open a new terminal and test:
-
-```powershell
-# Health check
-curl http://localhost:4000/api/health
-
-# Get projects
-curl http://localhost:4000/api/projects
-
-# Get clients
-curl http://localhost:4000/api/clients
-
-# Get testimonials
-curl http://localhost:4000/api/testimonials
-
-# Get site settings
-curl http://localhost:4000/api/settings
-
-# Test contact form (rate limited: 3/hour per IP)
-curl -X POST http://localhost:4000/api/contact `
-  -H "Content-Type: application/json" `
-  -d '{"name":"Test User","email":"test@example.com","message":"Test message from local"}'
-```
-
-Expected responses:
-- Health: `{"success":true,"message":"API is running",...}`
-- Projects: `{"success":true,"data":[{...}],...}`
-- Contact: `{"success":true,"message":"Message received..."}`
-
-If all tests pass, **local setup is complete!** ✅
 
 ---
 
-## Phase 2: GitHub Setup
+## Quick Reference
 
-### 2.1 Initialize Git Repository
+### SSH Access
+```bash
+ssh -i ~/.ssh/hostinger_vps root@31.97.65.93
+```
 
-```powershell
+### Deploy Frontend (one command)
+```bash
 cd "d:\Development Tools\Gemini-antigravity\personal-portfolio\daniel-granda-portfolio-prefinalversion"
-
-# Initialize git (if not already)
-git init
-
-# Create .gitignore
+npm run build && scp -i ~/.ssh/hostinger_vps -r dist/* root@31.97.65.93:/var/www/daniel-granda.com/
 ```
 
-Create `.gitignore` in project root:
-
-```gitignore
-# Dependencies
-node_modules/
-*/node_modules/
-
-# Environment variables
-.env
-.env.local
-.env.production
-backend/.env
-frontend/.env
-
-# Build outputs
-dist/
-build/
-backend/dist/
-frontend/dist/
-
-# Uploads
-uploads/
-backend/uploads/
-
-# Logs
-*.log
-npm-debug.log*
-logs/
-
-# OS files
-.DS_Store
-Thumbs.db
-desktop.ini
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# Temporary files
-*.tmp
-.cache/
-```
-
-### 2.2 Commit and Push
-
-```powershell
-git add .
-git commit -m "Initial commit: Portfolio backend + frontend
-
-- Express.js + TypeScript backend with PostgreSQL
-- React frontend with Tailwind CSS
-- Backend: Projects, Clients, Testimonials, Blog, Contact, Settings APIs
-- Frontend: Hero, Projects, Clients, Testimonials, Services, Contact Modal
-- Deployment configs for Caddy + PM2"
-
-# Create repository on GitHub (go to github.com/new)
-# Then push:
-
-git remote add origin https://github.com/YOUR_USERNAME/portfolio.git
-git branch -M main
-git push -u origin main
-```
-
----
-
-## Phase 3: VPS Deployment
-
-### 3.1 Connect to VPS
-
-```powershell
-ssh root@31.97.65.93
-```
-
-### 3.2 Upload Setup Script
-
-From your local machine (PowerShell):
-
-```powershell
-scp "d:\Development Tools\Gemini-antigravity\personal-portfolio\daniel-granda-portfolio-prefinalversion\deploy\vps-setup.sh" root@31.97.65.93:/root/
-```
-
-### 3.3 Run Initial VPS Setup
-
-**⚠️ Run this ONCE only — it installs Node.js, PostgreSQL, Caddy, PM2**
-
-On the VPS (via SSH):
-
+### Deploy Backend
 ```bash
-cd /root
-chmod +x vps-setup.sh
-sudo bash vps-setup.sh
-```
-
-This script will:
-- ✓ Install Node.js 20
-- ✓ Install PostgreSQL 16
-- ✓ Install Caddy (web server with auto-SSL)
-- ✓ Install PM2 (process manager)
-- ✓ Create database `portfolio_db`
-- ✓ Generate secure API key
-- ✓ Create `.env` file at `/opt/portfolio-api/.env`
-- ✓ Configure Caddy for `api.daniel-granda.com`
-
-**📝 IMPORTANT:** The script will output database credentials and API key. **Save these securely!**
-
-Example output:
-```
-DATABASE_URL=postgresql://portfolio:RANDOM_PASSWORD@localhost:5432/portfolio_db
-API_KEY=RANDOM_KEY_64_CHARS
-```
-
-### 3.4 Clone Repository
-
-On the VPS:
-
-```bash
-cd /opt/portfolio-api
-git clone https://github.com/YOUR_USERNAME/portfolio.git .
-```
-
-### 3.5 Build and Deploy
-
-```bash
-cd /opt/portfolio-api/backend
-
-# Install dependencies
-npm ci --production
-
-# Build TypeScript
-npm run build
-
-# Run migrations
-npm run migrate
-
-# Seed database
-npm run seed
-
-# Start with PM2
-pm2 start dist/index.js --name portfolio-api
-
-# Save PM2 process list
-pm2 save
-```
-
-### 3.6 Verify Backend is Running
-
-```bash
-# Check PM2 status
-pm2 status
-
-# Check logs
-pm2 logs portfolio-api
-
-# Test locally
-curl http://localhost:4000/api/health
-```
-
----
-
-## Phase 4: DNS & HTTPS Configuration
-
-### 4.1 Configure DNS A Record
-
-Point `api.daniel-granda.com` to your VPS IP: `31.97.65.93`
-
-**Option A: Via Hostinger API (I can do this for you)**
-
-**Option B: Via Hostinger Control Panel**
-1. Log in to Hostinger hPanel
-2. Go to Domains → daniel-granda.com → DNS Zone
-3. Add A record:
-   - **Name:** `api`
-   - **Type:** `A`
-   - **Points to:** `31.97.65.93`
-   - **TTL:** 3600
-
-### 4.2 Wait for DNS Propagation
-
-Check DNS propagation (takes 5-30 minutes):
-
-```powershell
-nslookup api.daniel-granda.com
-# Should return: 31.97.65.93
-```
-
-Or use: https://dnschecker.org/#A/api.daniel-granda.com
-
-### 4.3 Test HTTPS Endpoint
-
-Once DNS propagates, Caddy will automatically obtain SSL certificate:
-
-```powershell
-curl https://api.daniel-granda.com/api/health
-```
-
-Expected response:
-```json
-{
-  "success": true,
-  "message": "API is running",
-  "timestamp": "2026-02-13T..."
-}
-```
-
-**✅ Deployment Complete!**
-
----
-
-## Phase 5: Frontend Integration
-
-### 5.1 Update Frontend Environment
-
-In `frontend/.env`:
-
-```env
-VITE_API_URL=https://api.daniel-granda.com
-```
-
-### 5.2 Test Contact Form
-
-1. Start frontend dev server:
-   ```powershell
-   cd frontend
-   npm run dev
-   ```
-
-2. Open browser: http://localhost:5173
-3. Click "Let's Connect" → Fill form → Submit
-4. Check email (if RESEND_API_KEY configured) or check backend logs:
-   ```bash
-   ssh root@31.97.65.93
-   pm2 logs portfolio-api
-   ```
-
----
-
-## Ongoing Maintenance
-
-### Deploy Updates
-
-After making code changes:
-
-**Option 1: Automated (from local machine)**
-
-```powershell
-# From project root
-.\deploy\backend-deploy.sh
-```
-
-**Option 2: Manual (on VPS)**
-
-```bash
-ssh root@31.97.65.93
-cd /opt/portfolio-api
-git pull
-cd backend
-npm ci --production
-npm run build
-npm run migrate  # If schema changed
-pm2 restart portfolio-api
+ssh -i ~/.ssh/hostinger_vps root@31.97.65.93 \
+  "cd ~/daniel-granda/backend && git pull && npm ci --production && npm run build && pm2 restart portfolio-api --update-env"
 ```
 
 ### View Logs
-
 ```bash
-# PM2 logs
-pm2 logs portfolio-api
+# Backend API logs
+ssh -i ~/.ssh/hostinger_vps root@31.97.65.93 "pm2 logs portfolio-api --lines 50"
 
-# Caddy logs
-sudo tail -f /var/log/caddy/api-access.log
+# Caddy (web server) logs
+ssh -i ~/.ssh/hostinger_vps root@31.97.65.93 "tail -50 /var/log/caddy/frontend.log"
+ssh -i ~/.ssh/hostinger_vps root@31.97.65.93 "tail -50 /var/log/caddy/api.log"
 ```
 
-### Database Backup
+---
 
-```bash
-# On VPS
-pg_dump -U portfolio portfolio_db > /root/backups/portfolio_$(date +%Y%m%d).sql
+## VPS File Layout
+
+```
+/var/www/daniel-granda.com/       # Frontend static files (Caddy serves these)
+├── index.html                     # SPA entry point
+├── assets/
+│   └── index-*.js                 # Vite-bundled JS (filename changes per build)
+└── images/                        # Project images, portraits, etc.
+
+~/daniel-granda/                   # Project working directory
+├── backend/
+│   ├── src/                       # TypeScript source
+│   ├── dist/                      # Compiled JS (PM2 runs dist/index.js)
+│   ├── migrations/                # SQL migrations
+│   ├── seeds/                     # Database seed files
+│   ├── .env                       # Production environment variables
+│   └── node_modules/
+└── frontend/                      # Staging area (SCP lands here first)
+
+/etc/caddy/Caddyfile               # Web server configuration
 ```
 
-### Monitor API
+---
+
+## Backend Environment Variables
+
+Located at `~/daniel-granda/backend/.env` on the VPS:
+
+```env
+NODE_ENV=production
+PORT=4000
+DATABASE_URL=postgresql://portfolio:PASSWORD@localhost:5432/portfolio_db
+API_KEY=f364dc0aa90e14c90ec2e221413ba77ee0bf8229600299f8c404e886a399d013
+CORS_ORIGIN=https://daniel-granda.com,http://localhost:3002
+RESEND_API_KEY=                    # Optional — enables contact form email delivery
+CONTACT_EMAIL=contact@daniel-granda.com
+UPLOAD_DIR=uploads
+MAX_UPLOAD_SIZE_MB=10
+```
+
+**Important:** CORS_ORIGIN is comma-separated. The backend `cors.ts` splits this into an array.
+
+---
+
+## Frontend Environment
+
+Located at `.env.local` in the project root (local dev):
+
+```env
+VITE_API_URL=https://api.daniel-granda.com/api
+```
+
+This is baked into the build at compile time via Vite's `import.meta.env.VITE_API_URL`.
+
+---
+
+## DNS Configuration (Hostinger DNS)
+
+| Name | Type | Value | TTL | Purpose |
+|------|------|-------|-----|---------|
+| `@` | A | `31.97.65.93` | 300 | Root domain → VPS |
+| `@` | AAAA | `2a02:4780:2d:180f::1` | 300 | IPv6 → VPS |
+| `www` | CNAME | `daniel-granda.com` | 300 | www → root |
+| `api` | A | `31.97.65.93` | 3600 | API subdomain → VPS |
+| `@` | MX | `mx1.hostinger.com (5)`, `mx2.hostinger.com (10)` | 14400 | Email |
+| `@` | TXT | `v=spf1 include:_spf.mail.hostinger.com ~all` | 3600 | SPF |
+| `_dmarc` | TXT | `v=DMARC1; p=none` | 3600 | DMARC |
+| `hostingermail-*._domainkey` | CNAME | `hostingermail-*.dkim.mail.hostinger.com` | 300 | DKIM |
+
+**CDN is DISABLED.** Do not re-enable — it routes traffic to shared hosting instead of VPS.
+
+---
+
+## Caddy Configuration
+
+Located at `/etc/caddy/Caddyfile`:
+
+```caddyfile
+# Frontend - Static files
+daniel-granda.com, www.daniel-granda.com {
+    root * /var/www/daniel-granda.com
+    encode gzip
+    file_server
+    try_files {path} /index.html
+
+    header {
+        -Server
+        X-Frame-Options "SAMEORIGIN"
+        X-Content-Type-Options "nosniff"
+        X-XSS-Protection "1; mode=block"
+    }
+
+    log {
+        output file /var/log/caddy/frontend.log
+    }
+}
+
+# Backend API
+api.daniel-granda.com {
+    reverse_proxy localhost:4000
+    encode gzip
+
+    header {
+        -Server
+        X-Frame-Options "SAMEORIGIN"
+        X-Content-Type-Options "nosniff"
+        X-XSS-Protection "1; mode=block"
+    }
+
+    log {
+        output file /var/log/caddy/api.log
+    }
+}
+```
+
+After editing: `systemctl reload caddy`
+
+---
+
+## PM2 Process Management
 
 ```bash
-pm2 monit
+pm2 list                           # Show running processes
+pm2 logs portfolio-api             # Stream logs
+pm2 restart portfolio-api          # Restart (use --update-env if .env changed)
+pm2 stop portfolio-api             # Stop
+pm2 delete portfolio-api           # Remove
+pm2 save                           # Save process list for auto-restart on reboot
+pm2 startup                        # Enable auto-start on system boot
+pm2 monit                          # Real-time monitoring dashboard
 ```
+
+---
+
+## API Endpoints
+
+### Public (No Auth)
+```
+GET    /api/health              Health check
+GET    /api/projects            List projects
+GET    /api/projects/:id        Single project
+GET    /api/clients             List clients
+GET    /api/testimonials        List testimonials
+GET    /api/blog                Blog posts (paginated)
+GET    /api/settings            Site settings
+POST   /api/contact             Contact form (rate limited: 3/hr per IP)
+```
+
+### Admin (Require `Authorization: Bearer API_KEY`)
+```
+POST/PUT/DELETE  /api/projects/:id
+POST/PUT/DELETE  /api/clients/:id
+POST/PUT/DELETE  /api/testimonials/:id
+POST/PUT/DELETE  /api/blog/:slug
+POST             /api/blog/sync         Sync markdown from content/posts/
+POST/PUT/DELETE  /api/blog/curated/:id
+PUT              /api/settings
+POST             /api/upload            Image upload
+```
+
+### Response Format
+All endpoints return: `{ "success": true, "data": [...] }` or `{ "success": false, "error": "message" }`
+
+---
+
+## Step-by-Step: Full Deployment from Scratch
+
+If you need to redeploy everything from zero:
+
+### 1. VPS Initial Setup
+```bash
+ssh -i ~/.ssh/hostinger_vps root@31.97.65.93
+
+# Install Node.js
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+apt install -y nodejs
+
+# Install PostgreSQL 16
+apt install -y postgresql postgresql-contrib
+
+# Install Caddy
+apt install -y debian-keyring debian-archive-keyring apt-transport-https
+curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | tee /etc/apt/sources.list.d/caddy-stable.list
+apt update && apt install -y caddy
+
+# Install PM2
+npm install -g pm2
+```
+
+### 2. Database Setup
+```bash
+sudo -u postgres psql <<EOF
+CREATE USER portfolio WITH PASSWORD 'YOUR_SECURE_PASSWORD';
+CREATE DATABASE portfolio_db OWNER portfolio;
+GRANT ALL PRIVILEGES ON DATABASE portfolio_db TO portfolio;
+EOF
+```
+
+### 3. Clone & Build Backend
+```bash
+mkdir -p ~/daniel-granda
+cd ~/daniel-granda
+git clone https://github.com/dgranda1609/daniel-granda.git .
+cd backend
+npm ci --production
+npm run build
+npm run migrate
+npm run seed
+```
+
+### 4. Configure Backend Environment
+```bash
+cat > ~/daniel-granda/backend/.env << 'EOF'
+NODE_ENV=production
+PORT=4000
+DATABASE_URL=postgresql://portfolio:YOUR_SECURE_PASSWORD@localhost:5432/portfolio_db
+API_KEY=YOUR_64_CHAR_API_KEY
+CORS_ORIGIN=https://daniel-granda.com,http://localhost:3002
+CONTACT_EMAIL=contact@daniel-granda.com
+UPLOAD_DIR=uploads
+MAX_UPLOAD_SIZE_MB=10
+EOF
+```
+
+### 5. Start Backend with PM2
+```bash
+cd ~/daniel-granda/backend
+pm2 start dist/index.js --name portfolio-api
+pm2 save
+pm2 startup
+```
+
+### 6. Configure Caddy
+Write the Caddyfile (see "Caddy Configuration" section above), then:
+```bash
+systemctl reload caddy
+```
+
+### 7. Deploy Frontend
+From local machine:
+```bash
+cd "d:\Development Tools\Gemini-antigravity\personal-portfolio\daniel-granda-portfolio-prefinalversion"
+npm run build
+scp -i ~/.ssh/hostinger_vps -r dist/* root@31.97.65.93:/var/www/daniel-granda.com/
+```
+
+### 8. Configure DNS
+Set the DNS records listed in the "DNS Configuration" section above via Hostinger panel or API.
 
 ---
 
 ## Troubleshooting
 
+### Frontend shows old version
+```bash
+# Check what's deployed
+ssh -i ~/.ssh/hostinger_vps root@31.97.65.93 "ls -la /var/www/daniel-granda.com/assets/"
+# Re-deploy
+npm run build && scp -i ~/.ssh/hostinger_vps -r dist/* root@31.97.65.93:/var/www/daniel-granda.com/
+```
+
 ### Backend won't start
-
 ```bash
-pm2 logs portfolio-api --lines 50
-# Check for:
-# - Database connection errors → verify DATABASE_URL in .env
-# - Port conflicts → ensure port 4000 is free
-# - Missing dependencies → run npm ci --production
+ssh -i ~/.ssh/hostinger_vps root@31.97.65.93 "pm2 logs portfolio-api --lines 50"
+# Common issues:
+# - DATABASE_URL wrong → check .env
+# - Port 4000 in use → pm2 delete portfolio-api && pm2 start dist/index.js --name portfolio-api
+# - Missing deps → npm ci --production
 ```
 
-### Database connection failed
-
+### CORS errors in browser
 ```bash
-# Test PostgreSQL
-sudo -u postgres psql -c "SELECT version();"
-
-# Test connection
-psql "postgresql://portfolio:PASSWORD@localhost:5432/portfolio_db" -c "SELECT NOW();"
+# Check current CORS_ORIGIN in .env
+ssh -i ~/.ssh/hostinger_vps root@31.97.65.93 "grep CORS ~/daniel-granda/backend/.env"
+# Must include the frontend domain. After editing .env:
+ssh -i ~/.ssh/hostinger_vps root@31.97.65.93 "pm2 restart portfolio-api --update-env"
 ```
 
-### SSL certificate not issued
-
+### SSL certificate issues
 ```bash
-# Check Caddy status
-sudo systemctl status caddy
-
-# Check Caddy logs
-sudo journalctl -u caddy -n 50
-
-# Reload Caddy
-sudo systemctl reload caddy
+ssh -i ~/.ssh/hostinger_vps root@31.97.65.93 "systemctl status caddy && journalctl -u caddy -n 50"
+# Caddy auto-provisions SSL. If it fails, check DNS resolves to VPS:
+nslookup daniel-granda.com
 ```
 
-### Contact form not sending emails
+### Images not loading
+- Verify images exist: `ssh ... "ls /var/www/daniel-granda.com/images/"`
+- Check API image_url paths: `curl https://api.daniel-granda.com/api/projects | jq '.[].image_url'`
+- Paths should be `/images/filename.ext` (relative, served by Caddy)
 
-1. Check if `RESEND_API_KEY` is set in `/opt/portfolio-api/.env`
-2. If not configured, emails are skipped (check logs: "Resend API key not configured")
-3. To enable: Sign up at https://resend.com, get API key, add to `.env`
+### .reveal elements invisible after API load
+The `Home.tsx` uses a `MutationObserver` to detect dynamically-added `.reveal` elements. If new components are added with the `.reveal` class, they'll be automatically observed. If reveals break, check that:
+1. The MutationObserver in `Home.tsx` is still present
+2. New elements have `className="reveal"` (not a typo)
+3. The CSS in `index.html` has both `.reveal` (opacity: 0) and `.reveal.active` (opacity: 1)
 
 ---
 
-## API Endpoints Reference
-
-### Public Endpoints (No Authentication)
-
-```
-GET    /api/health              # Health check
-GET    /api/projects            # List all projects
-GET    /api/projects/:id        # Get single project
-GET    /api/clients             # List all clients
-GET    /api/testimonials        # List all testimonials
-GET    /api/blog                # List blog posts + curated links (paginated)
-GET    /api/settings            # Get site settings
-POST   /api/contact             # Submit contact form (rate limited: 3/hr per IP)
-```
-
-### Admin Endpoints (Require `Authorization: Bearer YOUR_API_KEY`)
-
-```
-POST   /api/projects            # Create project
-PUT    /api/projects/:id        # Update project
-DELETE /api/projects/:id        # Delete project
-
-POST   /api/clients             # Create client
-PUT    /api/clients/:id         # Update client
-DELETE /api/clients/:id         # Delete client
-
-POST   /api/testimonials        # Create testimonial
-PUT    /api/testimonials/:id    # Update testimonial
-DELETE /api/testimonials/:id    # Delete testimonial
-
-POST   /api/blog                # Create blog post
-PUT    /api/blog/:slug          # Update blog post
-DELETE /api/blog/:slug          # Delete blog post
-
-POST   /api/blog/sync           # Sync markdown files from content/posts/
-POST   /api/blog/curated        # Add curated link
-PUT    /api/blog/curated/:id    # Update curated link
-DELETE /api/blog/curated/:id    # Delete curated link
-
-PUT    /api/settings            # Update site settings
-POST   /api/upload              # Upload image (returns URL)
-```
-
-### Admin Request Example
+## Database Backup & Restore
 
 ```bash
-curl -X POST https://api.daniel-granda.com/api/projects \
-  -H "Authorization: Bearer YOUR_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"title":"New Project","description":"Project description",...}'
+# Backup
+ssh -i ~/.ssh/hostinger_vps root@31.97.65.93 \
+  "pg_dump -U portfolio portfolio_db > ~/backups/portfolio_$(date +%Y%m%d).sql"
+
+# Restore
+ssh -i ~/.ssh/hostinger_vps root@31.97.65.93 \
+  "psql -U portfolio portfolio_db < ~/backups/portfolio_YYYYMMDD.sql"
 ```
-
----
-
-## Stack Summary
-
-**Backend:**
-- Express.js + TypeScript
-- PostgreSQL 16 (raw `pg`, no ORM)
-- Zod validation
-- Resend (email, optional)
-- Caddy (reverse proxy + auto-SSL)
-- PM2 (process manager)
-
-**Frontend:**
-- React + TypeScript
-- Tailwind CSS
-- Framer Motion
-- Lucide React (icons)
-
-**Infrastructure:**
-- VPS: Hostinger KVM 2 (31.97.65.93)
-- Domain: api.daniel-granda.com
-- Database: PostgreSQL 16 on VPS
-- SSL: Auto-issued by Caddy (Let's Encrypt)
 
 ---
 
 ## Security Notes
 
-1. **API Key:** 64-character random string for admin authentication
-2. **Database:** Credentials auto-generated during setup
-3. **CORS:** Locked to `https://daniel-granda.com` in production
-4. **Rate Limiting:** Contact form limited to 3 submissions/hour per IP
-5. **HTTPS:** Enforced via Caddy with HSTS header
-6. **Secrets:** Never commit `.env` files to Git
-
----
-
-**Questions or issues?** Check logs first:
-- Backend: `pm2 logs portfolio-api`
-- Caddy: `sudo journalctl -u caddy`
-- PostgreSQL: `sudo journalctl -u postgresql`
+1. **API Key:** 64-char random string — used for all admin endpoints (`Authorization: Bearer KEY`)
+2. **SSH Key:** ed25519 at `~/.ssh/hostinger_vps` — only auth method for VPS
+3. **Database:** Credentials in `.env` only, never committed to git
+4. **CORS:** Locked to `https://daniel-granda.com` + dev origins
+5. **Rate Limiting:** Contact form = 3 submissions/hour per IP
+6. **HTTPS:** Enforced by Caddy with auto-redirect HTTP → HTTPS
+7. **CDN:** Disabled — traffic goes direct to VPS
+8. **Headers:** Security headers set by Caddy (X-Frame-Options, X-Content-Type-Options, etc.)

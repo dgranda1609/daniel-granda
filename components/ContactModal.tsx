@@ -57,7 +57,7 @@ export const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) =
     setErrorMsg('');
 
     try {
-      const res = await fetch(`${API_BASE}/api/contact`, {
+      const res = await fetch(`${API_BASE}/contact`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, company: company || undefined, message }),
@@ -106,9 +106,9 @@ export const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) =
         <div
           className="rounded-2xl overflow-hidden border border-brand-primary/10"
           style={{
-            background: 'rgba(20, 12, 12, 0.85)',
+            background: 'var(--color-modal-bg)',
             backdropFilter: 'blur(40px) saturate(180%)',
-            boxShadow: '0 40px 100px rgba(255, 56, 49, 0.15), 0 0 0 1px rgba(255, 253, 219, 0.05)',
+            boxShadow: '0 40px 100px rgba(255, 56, 49, 0.15), 0 0 0 1px var(--color-glass-border)',
           }}
         >
           {/* Header accent bar */}
