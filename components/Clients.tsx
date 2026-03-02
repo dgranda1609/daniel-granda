@@ -7,7 +7,7 @@ const FALLBACK_CLIENTS = [
   { name: "United Nations / ILO", category: "Documentary" },
   { name: "Microsoft", category: "Brand Film" },
   { name: "The North Face", category: "Video Production" },
-  { name: "Kreyol Essence", category: "Lead Producer" },
+  { name: "Kreyol Essence", category: "Brand Content (2023–2025)" },
   { name: "America Television", category: "Broadcast" },
   { name: "TELEFE", category: "Broadcast" },
   { name: "Dinamo Zagreb", category: "Motion Graphics" },

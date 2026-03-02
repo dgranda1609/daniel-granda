@@ -1,3 +1,4 @@
+DELETE FROM projects;
 INSERT INTO projects (title, slug, summary, tags, image_url, sort_order, visible) VALUES
 (
   'ILO Documentary Series',
@@ -36,11 +37,18 @@ INSERT INTO projects (title, slug, summary, tags, image_url, sort_order, visible
   true
 ),
 (
-  'Kreyol Essence',
-  'kreyol-essence',
-  'Lead producer. 100+ monthly assets, AI-first pipeline, 35% faster delivery. Shark Tank brand.',
-  ARRAY['Lead Producer', 'AI Pipeline', 'Brand'],
-  '/images/kreyolessence-3x4-img-1.jpg',
+  'AI Production Pipeline',
+  'ai-production-pipeline',
+  'Client: DTC Brands. 100+ monthly assets delivered with 35% faster turnaround and 96% on-time delivery.',
+  ARRAY['AI Systems', 'Automation', 'n8n', 'Production Pipeline'],
+  '/images/ai-systems-hero.webp',
   5,
   true
-);
+)
+ON CONFLICT (slug) DO UPDATE SET
+  title = EXCLUDED.title,
+  summary = EXCLUDED.summary,
+  tags = EXCLUDED.tags,
+  image_url = EXCLUDED.image_url,
+  sort_order = EXCLUDED.sort_order,
+  visible = EXCLUDED.visible;

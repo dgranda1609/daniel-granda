@@ -69,8 +69,8 @@ export const Hero: React.FC = () => {
             {/* Credential Ticker */}
             <div className="mt-16 overflow-hidden w-full max-w-3xl mx-auto">
               <div className="flex animate-ticker items-center whitespace-nowrap opacity-40">
-                {['Cannes World Film Festival', 'Microsoft', 'United Nations', 'The North Face', 'Kreyol Essence', 'Impact Doc Awards', '10+ Festival Selections',
-                  'Cannes World Film Festival', 'Microsoft', 'United Nations', 'The North Face', 'Kreyol Essence', 'Impact Doc Awards', '10+ Festival Selections'].map((cred, i) => (
+                {['Cannes World Film Festival', 'Microsoft', 'United Nations', 'The North Face', '100+ Monthly Assets', 'Impact Doc Awards', '10+ Festival Selections',
+                  'Cannes World Film Festival', 'Microsoft', 'United Nations', 'The North Face', '100+ Monthly Assets', 'Impact Doc Awards', '10+ Festival Selections'].map((cred, i) => (
                     <span key={i} className="text-11 uppercase tracking-[0.2em] font-heading font-medium mx-16">{cred}<span className="mx-16 opacity-40">·</span></span>
                   ))}
               </div>

@@ -1,3 +1,4 @@
+DELETE FROM site_settings;
 INSERT INTO site_settings (key, value) VALUES
 ('contact', '{"email": "contact@daniel-granda.com", "phone": "786.556.7280"}'::jsonb),
 ('social', '{"instagram": "https://instagram.com/danielgranda", "linkedin": "https://linkedin.com/in/daniel-granda-video-producer", "x": "https://x.com/danielgranda"}'::jsonb),

@@ -9,7 +9,7 @@ const FALLBACK_PROJECTS = [
   { id: '2', title: 'Dinamo Zagreb', summary: 'Motion graphics and visual identity system for European football club.', tags: ['Motion', 'Brand Identity', 'Sports'], imageUrl: '/images/dinamo-hero.gif', slug: 'dinamo-zagreb' },
   { id: '3', title: 'Miami Weddings', summary: 'Luxury wedding cinematography. Multi-cam, same-day edits, cinematic color.', tags: ['Cinematography', 'Editing', 'Color'], imageUrl: '/images/miami-weddings-hero.gif', slug: 'miami-weddings' },
   { id: '4', title: 'Alternative Audiovisual', summary: 'Creative studio: brand films, music videos, and commercial production.', tags: ['Production', 'Direction', 'Creative'], imageUrl: '/images/alternative-audiovisual-hero.jpg', slug: 'alternative-audiovisual' },
-  { id: '5', title: 'Kreyol Essence', summary: 'Lead producer. 100+ monthly assets, AI-first pipeline, 35% faster delivery. Shark Tank brand.', tags: ['Lead Producer', 'AI Pipeline', 'Brand'], imageUrl: '/images/kreyolessence-3x4-img-1.jpg', slug: 'kreyol-essence' },
+  { id: '5', title: 'AI Production Pipeline', summary: 'Client: DTC Brands. 100+ monthly assets delivered with 35% faster turnaround and 96% on-time delivery.', tags: ['AI Systems', 'Automation', 'n8n', 'Production Pipeline'], imageUrl: '/images/ai-systems-hero.webp', slug: 'ai-production-pipeline' },
 ];
 
 interface ProjectCardProps {
