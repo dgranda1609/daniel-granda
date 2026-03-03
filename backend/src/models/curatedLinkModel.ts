@@ -56,6 +56,67 @@ export const curatedLinkModel = {
     return result.rows[0];
   },
 
+  async upsertByUrl(data: {
+    title: string;
+    url: string;
+    source: string;
+    excerpt?: string;
+    category?: string;
+    tags: string[];
+    featured_image?: string;
+    is_published: boolean;
+  }) {
+    const result = await pool.query(
+      `WITH existing AS (
+         SELECT id FROM curated_links WHERE url = $2 ORDER BY curated_at DESC LIMIT 1
+       )
+       INSERT INTO curated_links (title, url, source, excerpt, category, tags, featured_image, is_published)
+       SELECT $1, $2, $3, $4, $5, $6, $7, $8
+       WHERE NOT EXISTS (SELECT 1 FROM existing)
+       RETURNING *`,
+      [
+        data.title,
+        data.url,
+        data.source,
+        data.excerpt || null,
+        data.category || null,
+        data.tags,
+        data.featured_image || null,
+        data.is_published,
+      ],
+    );
+
+    if (result.rows[0]) return result.rows[0];
+
+    const updated = await pool.query(
+      `UPDATE curated_links
+       SET title = $1,
+           source = $3,
+           excerpt = $4,
+           category = $5,
+           tags = $6,
+           featured_image = $7,
+           is_published = $8,
+           curated_at = NOW()
+       WHERE id = (
+         SELECT id FROM curated_links WHERE url = $2 ORDER BY curated_at DESC LIMIT 1
+       )
+       RETURNING *`,
+      [
+        data.title,
+        data.url,
+        data.source,
+        data.excerpt || null,
+        data.category || null,
+        data.tags,
+        data.featured_image || null,
+        data.is_published,
+      ],
+    );
+
+    return updated.rows[0] || null;
+  },
+
   async update(id: string, data: Record<string, unknown>) {
     const fields = Object.keys(data);
     if (fields.length === 0) return null;

@@ -70,7 +70,7 @@ export async function syncCuratedLinks(): Promise<{ synced: number; errors: stri
 
     for (const link of links) {
       try {
-        await curatedLinkModel.create({
+        await curatedLinkModel.upsertByUrl({
           title: link.title,
           url: link.url,
           source: link.source,
