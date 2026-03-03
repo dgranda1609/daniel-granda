@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../lib/api';
 import { Navbar } from '../components/Navbar';
@@ -46,11 +47,32 @@ export const Articles: React.FC = () => {
                             // API client runs snakeToCamel(), so runtime keys are camelCase
                             // despite the shared FeedItem type declaring snake_case
                             const item = rawItem as any;
+                            const media = item.featuredImage as string | undefined;
+                            const isVideo = !!media && /\.(mp4|webm|ogg)$/i.test(media);
+
                             return (
                             <article
                                 key={item.id}
                                 className="group relative border border-brand-primary/10 bg-brand-primary/5 p-6 hover:border-brand-accent/50 transition-colors duration-300 reveal active"
                             >
+                                {media && (
+                                    <div className="mb-4 overflow-hidden border border-brand-primary/15 bg-black/20">
+                                        {isVideo ? (
+                                            <video
+                                                src={media}
+                                                className="w-full h-44 object-cover"
+                                                muted
+                                                loop
+                                                autoPlay
+                                                playsInline
+                                                controls
+                                            />
+                                        ) : (
+                                            <img src={media} alt={item.title} className="w-full h-44 object-cover" loading="lazy" />
+                                        )}
+                                    </div>
+                                )}
+
                                 <div className="mb-4 flex items-center justify-between text-sm text-brand-secondary">
                                     <span>{item.category}</span>
                                     <span>{format(new Date(item.date), 'MMM d, yyyy')}</span>
@@ -63,7 +85,9 @@ export const Articles: React.FC = () => {
                                             <span className="text-xs border border-brand-secondary px-1">EXT</span>
                                         </a>
                                     ) : (
-                                        item.title
+                                        <Link to={`/articles/${item.slugOrUrl}`} className="hover:text-brand-accent transition-colors">
+                                            {item.title}
+                                        </Link>
                                     )}
                                 </h2>
 
@@ -72,7 +96,7 @@ export const Articles: React.FC = () => {
                                 </p>
 
                                 <div className="flex flex-wrap gap-2 mt-auto">
-                                    {item.tags.map(tag => (
+                                    {item.tags.map((tag: string) => (
                                         <span key={tag} className="text-xs bg-brand-primary/5 px-2 py-1 text-brand-secondary">
                                             #{tag}
                                         </span>

@@ -11,7 +11,7 @@ const productionOrigins = splitOrigins(env.CORS_ORIGIN);
 
 export const corsConfig: CorsOptions = {
   origin: env.NODE_ENV === 'development'
-    ? [...new Set([...productionOrigins, 'http://localhost:3002', 'http://localhost:5173'])]
+    ? [...new Set([...productionOrigins, 'http://localhost:3002', 'http://localhost:3003', 'http://localhost:5173'])]
     : productionOrigins.length <= 1
       ? productionOrigins[0] ?? false
       : productionOrigins,

@@ -5,6 +5,7 @@ excerpt: "A practical guide to choosing your first editing software based on you
 author: "Daniel Granda"
 category: "Editing Workflow"
 tags: ["video-editing", "premiere-pro", "davinci-resolve", "final-cut-pro", "creator-growth"]
+featuredImage: "/videos/linkedin-article-video.mp4"
 published: true
 publishedAt: "2026-03-03"
 ---

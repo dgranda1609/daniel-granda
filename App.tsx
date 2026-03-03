@@ -5,6 +5,7 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from './lib/api';
 import { Home } from './pages/Home';
 import { Articles } from './pages/Articles';
+import { ArticlePost } from './pages/ArticlePost';
 import { CaseStudy } from './pages/CaseStudy';
 import { CaseStudyNoir } from './pages/CaseStudyNoir';
 import { Admin } from './pages/Admin';
@@ -16,6 +17,7 @@ const App: React.FC = () => {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/articles" element={<Articles />} />
+          <Route path="/articles/:slug" element={<ArticlePost />} />
           <Route path="/work" element={<Navigate to="/#work" replace />} />
           <Route path="/work/:slug" element={<CaseStudy />} />
           <Route path="/noir/:slug" element={<CaseStudyNoir />} />
