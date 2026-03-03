@@ -71,7 +71,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onContactClick, theme, onThemeTo
             transform: menuOpen ? 'translateY(9px) rotate(45deg)' : 'none',
           }} />
           <span style={{
-            display: 'block', width: '80%', height: 2,
+            display: 'block', height: 2,
             background: 'var(--color-primary)',
             transition: 'opacity 0.3s, width 0.3s',
             marginTop: 7,
@@ -88,20 +88,17 @@ export const Navbar: React.FC<NavbarProps> = ({ onContactClick, theme, onThemeTo
         </button>
 
         {/* Center Logo */}
-        <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-10">
-          <img src="/sphere-logo.png" alt="Daniel Granda" className="w-32 h-32 md:w-40 md:h-40 object-contain" />
-          <span className="font-serif text-28 md:text-36 font-bold tracking-tighter text-brand-primary">Daniel Granda</span>
+        <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-10 pointer-events-none">
+          <img src="/sphere-logo.png" alt="Daniel Granda" className="w-28 h-28 md:w-40 md:h-40 object-contain" />
+          <span className="hidden md:inline font-serif text-36 font-bold tracking-tighter text-brand-primary">Daniel Granda</span>
         </div>
 
         {/* Right Actions */}
-        <div className="flex items-center gap-16 md:gap-24">
+        <div className="flex items-center gap-12 md:gap-24">
           <ThemeToggle theme={theme} onToggle={onThemeToggle} />
-          <button onClick={onContactClick} className="hidden md:block text-13 border-b border-brand-accent text-brand-accent hover:opacity-80 transition-opacity bg-transparent cursor-pointer">
-            Let's Talk
-          </button>
           <button
             onClick={onContactClick}
-            className="bg-brand-accent text-white px-16 py-8 md:px-24 md:py-12 font-serif font-black text-13 md:text-20 leading-none transition-all hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(255,56,49,0.3)]"
+            className="hidden md:block bg-brand-accent text-white px-16 py-8 md:px-24 md:py-12 font-serif font-black text-13 md:text-20 leading-none transition-all hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(255,56,49,0.3)]"
           >
             Let's Connect
           </button>

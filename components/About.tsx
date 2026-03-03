@@ -82,10 +82,17 @@ export const About: React.FC = () => {
       ([entry]) => {
         if (entry.isIntersecting) setStatsInView(true);
       },
-      { threshold: 0.3 },
+      { threshold: 0.2, rootMargin: '0px 0px -10% 0px' },
     );
     observer.observe(statsRef.current);
-    return () => observer.disconnect();
+
+    // Fallback: ensure counters animate even if observer misses on some mobile browsers
+    const fallback = window.setTimeout(() => setStatsInView(true), 2200);
+
+    return () => {
+      observer.disconnect();
+      window.clearTimeout(fallback);
+    };
   }, []);
 
   return (
