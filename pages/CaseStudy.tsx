@@ -34,6 +34,10 @@ export const CaseStudy: React.FC = () => {
         return <div className="min-h-screen bg-brand-bg flex items-center justify-center text-brand-primary">Project not found</div>;
     }
 
+    const heroImage = (project as any).imageUrl || (project as any).image_url;
+    const fullDescription = (project as any).fullDescription || (project as any).full_description || (project as any).summary;
+    const galleryImages: string[] = (project as any).images || [];
+
     console.log('Rendering project:', project.title);
 
     return (
@@ -47,7 +51,7 @@ export const CaseStudy: React.FC = () => {
                 {/* Blurred Background Image */}
                 <div className="absolute inset-0 z-0">
                     <img
-                        src={project.image_url}
+                        src={heroImage}
                         alt=""
                         className="w-full h-full object-cover filter blur-xl scale-110 opacity-60"
                     />
@@ -80,8 +84,8 @@ export const CaseStudy: React.FC = () => {
 
                 {/* 3 IMAGES LAYOUT */}
                 <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-24">
-                    {project.images && project.images.length > 0 ? (
-                        project.images.slice(0, 3).map((img: string, index: number) => (
+                    {galleryImages.length > 0 ? (
+                        galleryImages.slice(0, 3).map((img: string, index: number) => (
                             <div key={index} className={`relative aspect-[3/4] overflow-hidden rounded-lg border border-brand-primary/10`}>
                                 <img
                                     src={img}
@@ -94,7 +98,7 @@ export const CaseStudy: React.FC = () => {
                         // Fallback if images array is empty (use main image 3 times or placeholders)
                         [1, 2, 3].map((_, i) => (
                             <div key={i} className="relative aspect-[3/4] overflow-hidden rounded-lg border border-brand-primary/10 bg-brand-primary/5">
-                                <img src={project.image_url} alt="" className="w-full h-full object-cover opacity-50 grayscale hover:grayscale-0 transition-all" />
+                                <img src={heroImage} alt="" className="w-full h-full object-cover opacity-50 grayscale hover:grayscale-0 transition-all" />
                             </div>
                         ))
                     )}
@@ -105,7 +109,7 @@ export const CaseStudy: React.FC = () => {
                     <div className="w-12 h-1 bg-brand-accent mx-auto mb-12" />
                     <h2 className="font-heading text-3xl md:text-4xl font-bold mb-8">The Challenge & Outcome</h2>
                     <p className="text-lg md:text-xl leading-relaxed text-brand-secondary/90 text-justify md:text-center">
-                        {project.full_description}
+                        {fullDescription}
                     </p>
 
                     <div className="flex flex-wrap justify-center gap-4 mt-12">

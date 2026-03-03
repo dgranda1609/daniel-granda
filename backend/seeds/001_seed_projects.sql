@@ -1,11 +1,29 @@
 DELETE FROM projects;
-INSERT INTO projects (title, slug, summary, tags, image_url, sort_order, visible) VALUES
+INSERT INTO projects (
+  title,
+  slug,
+  summary,
+  full_description,
+  tags,
+  image_url,
+  images,
+  tools,
+  client,
+  outcome,
+  sort_order,
+  visible
+) VALUES
 (
   'ILO Documentary Series',
   'ilo-documentary-series',
   '3-episode documentary for the United Nations. Andes, Amazon & Coast. Adopted by 5 NGOs. 100k+ views.',
+  'For this series, the goal was to translate complex labor and sustainability realities into human stories that could travel across cultures. We designed a three-episode narrative arc across the Andes, Amazon, and Coast, balancing journalistic credibility with emotional pacing. The production required location-adaptive cinematography, multilingual interview coordination, and an edit structure that stayed clear for policy audiences without losing cinematic intensity. The final series was adopted by multiple NGOs as an advocacy and education asset and surpassed 100k cumulative views across distribution channels.',
   ARRAY['Documentary', 'UN/ILO', 'Cannes'],
   '/images/ILO-hero.gif',
+  ARRAY['/images/ILO-hero.gif'],
+  ARRAY['Premiere Pro', 'DaVinci Resolve', 'After Effects', 'Frame.io'],
+  'United Nations / ILO',
+  '3-part documentary system used by 5 NGOs with measurable audience reach and long-tail educational reuse.',
   1,
   true
 ),
@@ -13,8 +31,13 @@ INSERT INTO projects (title, slug, summary, tags, image_url, sort_order, visible
   'Dinamo Zagreb',
   'dinamo-zagreb',
   'Motion graphics and visual identity system for European football club.',
+  'This engagement focused on building a motion language that could move consistently across match-day promos, social edits, and sponsor-integrated assets. Instead of one-off animations, we developed a repeatable visual system: transition grammar, typography behavior, speed ramps, and color hierarchy optimized for high-energy sports communication. The result was a more coherent visual identity across short-form outputs and faster production turnaround for campaign cycles.',
   ARRAY['Motion', 'Brand Identity', 'Sports'],
   '/images/dinamo-hero.gif',
+  ARRAY['/images/dinamo-hero.gif'],
+  ARRAY['After Effects', 'Photoshop', 'Premiere Pro'],
+  'Dinamo Zagreb',
+  'Established a reusable motion toolkit that improved consistency and reduced revision loops during campaign production.',
   2,
   true
 ),
@@ -22,8 +45,13 @@ INSERT INTO projects (title, slug, summary, tags, image_url, sort_order, visible
   'Miami Weddings',
   'miami-weddings',
   'Luxury wedding cinematography. Multi-cam, same-day edits, cinematic color.',
+  'This body of work was built around high-stakes, one-day production windows where storytelling and reliability matter equally. We designed a capture-to-delivery workflow for luxury wedding clients: multi-cam coverage plans, priority scene indexing for same-day edits, and a cinematic color pipeline that held consistency across mixed lighting environments. The focus was always emotional clarity first, technical polish second, delivered under extreme turnaround constraints.',
   ARRAY['Cinematography', 'Editing', 'Color'],
   '/images/miami-weddings-hero.gif',
+  ARRAY['/images/miami-weddings-hero.gif'],
+  ARRAY['Premiere Pro', 'DaVinci Resolve', 'Lightroom'],
+  'Private Clients (Miami)',
+  'Improved same-day delivery reliability while maintaining premium cinematic quality standards.',
   3,
   true
 ),
@@ -31,8 +59,13 @@ INSERT INTO projects (title, slug, summary, tags, image_url, sort_order, visible
   'Alternative Audiovisual',
   'alternative-audiovisual',
   'Creative studio: brand films, music videos, and commercial production.',
+  'Alternative Audiovisual was structured as a multi-format creative engine, not a single-service studio. We produced brand films, music videos, and commercial content with a shared strategic layer: clear positioning, strong visual motifs, and adaptable distribution cuts. The key advantage was cross-pollinating techniques between formats so campaigns could feel distinct while still scalable for modern content calendars.',
   ARRAY['Production', 'Direction', 'Creative'],
   '/images/alternative-audiovisual-hero.jpg',
+  ARRAY['/images/alternative-audiovisual-hero.jpg'],
+  ARRAY['After Effects', 'Premiere Pro', 'DaVinci Resolve', 'Frame.io'],
+  'Alternative Audiovisual',
+  'Created a flexible production model capable of serving brand, music, and commercial objectives with one integrated workflow.',
   4,
   true
 ),
@@ -40,15 +73,25 @@ INSERT INTO projects (title, slug, summary, tags, image_url, sort_order, visible
   'AI Production Pipeline',
   'ai-production-pipeline',
   'Client: DTC Brands. 100+ monthly assets delivered with 35% faster turnaround and 96% on-time delivery.',
+  'This project converted a manual post-production workflow into an AI-assisted content operations system. We orchestrated intake, briefing, edit routing, review states, and delivery updates through automation-first handoffs. The stack combined creative judgment with structured execution: AI support for repetitive production tasks, n8n orchestration for state changes, and human checkpoints for quality control. The pipeline consistently shipped 100+ assets per month with faster cycle times and stronger delivery reliability.',
   ARRAY['AI Systems', 'Automation', 'n8n', 'Production Pipeline'],
   '/images/ai-systems-hero.webp',
+  ARRAY['/images/ai-systems-hero.webp'],
+  ARRAY['n8n', 'OpenAI API', 'Frame.io', 'Slack'],
+  'DTC Brands',
+  '35% faster turnaround and 96% on-time delivery at high monthly output volume.',
   5,
   true
 )
 ON CONFLICT (slug) DO UPDATE SET
   title = EXCLUDED.title,
   summary = EXCLUDED.summary,
+  full_description = EXCLUDED.full_description,
   tags = EXCLUDED.tags,
   image_url = EXCLUDED.image_url,
+  images = EXCLUDED.images,
+  tools = EXCLUDED.tools,
+  client = EXCLUDED.client,
+  outcome = EXCLUDED.outcome,
   sort_order = EXCLUDED.sort_order,
   visible = EXCLUDED.visible;
