@@ -7,27 +7,30 @@ import { curatedLinkModel } from '../models/curatedLinkModel.js';
 const CONTENT_DIR = path.resolve(process.cwd(), '..', 'content');
 
 export async function syncBlogPosts(): Promise<{ synced: number; errors: string[] }> {
-  const postsDir = path.join(CONTENT_DIR, 'posts');
+  const articlesDir = path.join(CONTENT_DIR, 'articles');
+  const postsDir = path.join(CONTENT_DIR, 'posts'); // legacy fallback
+  const sourceDir = fs.existsSync(articlesDir) ? articlesDir : postsDir;
   const errors: string[] = [];
   let synced = 0;
 
-  if (!fs.existsSync(postsDir)) {
-    return { synced: 0, errors: ['Posts directory not found'] };
+  if (!fs.existsSync(sourceDir)) {
+    return { synced: 0, errors: ['Articles directory not found'] };
   }
 
-  const files = fs.readdirSync(postsDir).filter(
+  const files = fs.readdirSync(sourceDir).filter(
     (f) => f.endsWith('.md') && !f.startsWith('_'),
   );
 
   for (const file of files) {
     try {
-      const raw = fs.readFileSync(path.join(postsDir, file), 'utf-8');
+      const raw = fs.readFileSync(path.join(sourceDir, file), 'utf-8');
       const parsed = parseMarkdownFile(raw, file);
       await blogPostModel.upsertBySlug({
         title: parsed.title,
         slug: parsed.slug,
         excerpt: parsed.excerpt,
-        content: parsed.html,
+        // Store raw Markdown, render at display time. Prevents literal HTML tags leaking in UI.
+        content: parsed.content,
         author: parsed.author,
         category: parsed.category,
         tags: parsed.tags,
