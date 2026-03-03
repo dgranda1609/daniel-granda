@@ -9,6 +9,15 @@ const Squiggle = () => (
 export const Hero: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [progress, setProgress] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 767px)');
+    const check = () => setIsMobile(mq.matches);
+    check();
+    mq.addEventListener('change', check);
+    return () => mq.removeEventListener('change', check);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -78,7 +87,7 @@ export const Hero: React.FC = () => {
           </div>
 
           {/* Bottom Row - Supporting text on the left */}
-          <div className="mt-auto flex flex-col md:flex-row items-end justify-between w-full pb-80">
+          <div className="mt-auto flex flex-col md:flex-row items-start md:items-end justify-between w-full pb-32 md:pb-80">
 
             <div
               className="max-w-xl md:w-[45%] text-left transition-all duration-75"
@@ -90,7 +99,7 @@ export const Hero: React.FC = () => {
               <h2 className="font-serif text-24 md:text-40 lg:text-[48px] leading-[1.2] font-medium mb-32 text-brand-primary opacity-90">
                 Full-stack video producer and AI visual strategist. From documentary to brand content — every frame earns its place.
               </h2>
-              <div className="flex items-center gap-24">
+              <div className="flex flex-wrap items-center gap-24">
                 <a href="#work" className="bg-brand-accent text-white px-32 py-16 font-serif font-bold text-20 md:text-36 lg:text-[44px] cursor-pointer hover:scale-105 active:scale-95 transition-all tracking-tight shadow-[0_0_30px_rgba(255,56,49,0.3)] no-underline">
                   My Work
                 </a>
@@ -105,10 +114,17 @@ export const Hero: React.FC = () => {
           </div>
         </div>
 
-        {/* Expanding Video Layer - Animated bottom-right card */}
+        {/* Expanding Video Layer - Animated bottom-right on desktop, centered on mobile */}
         <div
-          className="absolute z-0 md:z-20 overflow-hidden shadow-[0_0_120px_rgba(0,0,0,0.9)] transition-all duration-75 ease-out"
-          style={{
+          className={`absolute z-5 md:z-20 overflow-hidden shadow-[0_0_120px_rgba(0,0,0,0.9)] ${isMobile ? '' : 'transition-all duration-75 ease-out'}`}
+          style={isMobile ? {
+            width: '88vw',
+            height: '49.5vw',
+            top: '54%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            borderRadius: '12px',
+          } : {
             width: `${videoWidth}%`,
             height: `${videoHeight}%`,
             right: `${videoRight}%`,

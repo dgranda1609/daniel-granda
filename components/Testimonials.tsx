@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Quote } from 'lucide-react';
 import { useTestimonials } from '../lib/hooks/useApi';
 import type { Theme } from '../lib/useTheme';
@@ -44,10 +44,11 @@ const FALLBACK_TESTIMONIALS = [
   }
 ];
 
+// ─── Desktop ticker card ──────────────────────────────────────────────────────
+
 const TestimonialCard: React.FC<{ testimonial: any; index: number }> = ({ testimonial, index }) => {
   const rotations = ['rotate-[1deg]', 'rotate-[-1deg]', 'rotate-[0.5deg]', 'rotate-[-0.5deg]'];
   const rotation = rotations[index % rotations.length];
-
   const isAccent = testimonial.color === 'accent';
   const bgColor = isAccent ? 'bg-brand-accent text-brand-bg' : 'bg-brand-primary text-brand-accent';
   const quoteColor = isAccent ? 'text-brand-bg/20' : 'text-brand-accent/20';
@@ -56,80 +57,159 @@ const TestimonialCard: React.FC<{ testimonial: any; index: number }> = ({ testim
     : 'hover:shadow-[0_0_50px_12px_rgba(255,56,49,0.35)]';
 
   return (
-    <div className={`flex-shrink-0 w-[280px] md:w-[320px] mx-12 md:mx-20 ${rotation}`}>
-      <div
-        className={`relative pt-16 px-20 pb-16 md:pt-20 md:px-24 md:pb-20 rounded-lg shadow-xl ${bgColor} ${glowShadow} select-none border border-black/5 transition-all duration-500 hover:scale-105 hover:z-50`}
-      >
+    <div className={`flex-shrink-0 w-[240px] md:w-[320px] mx-8 md:mx-20 ${rotation}`}>
+      <div className={`relative pt-12 px-14 pb-12 md:pt-20 md:px-24 md:pb-20 rounded-lg shadow-xl ${bgColor} ${glowShadow} select-none border border-black/5 transition-all duration-500 hover:scale-105 hover:z-50`}>
         <div className="flex justify-between items-start">
-          <Quote size={14} className={quoteColor} />
-          <Quote size={14} className={`${quoteColor} rotate-180`} />
+          <Quote size={12} className={quoteColor} />
+          <Quote size={12} className={`${quoteColor} rotate-180`} />
         </div>
-
-        <p className="text-13 md:text-14 font-medium leading-snug font-body mt-6">
-          {testimonial.text}
-        </p>
-
-        <div className="mt-16 pt-10 border-t border-current/10">
-          <div className="font-serif font-black text-13 md:text-15 uppercase tracking-tighter">{testimonial.author}</div>
-          <div className="text-10 opacity-60 font-body uppercase tracking-widest mt-1">{testimonial.role}</div>
+        <p className="text-12 md:text-14 font-medium leading-snug font-body mt-6">{testimonial.text}</p>
+        <div className="mt-12 pt-8 border-t border-current/10">
+          <div className="font-serif font-black text-12 md:text-15 uppercase tracking-tighter">{testimonial.author}</div>
+          <div className="text-[10px] opacity-60 font-body uppercase tracking-widest mt-1">{testimonial.role}</div>
         </div>
       </div>
     </div>
   );
 };
 
+// ─── Mobile full-width card ───────────────────────────────────────────────────
+
+const MobileCard: React.FC<{ testimonial: any; visible: boolean; onPressStart: () => void; onPressEnd: () => void }> = ({
+  testimonial, visible, onPressStart, onPressEnd
+}) => {
+  const isAccent = testimonial.color === 'accent';
+  const bgColor = isAccent ? 'bg-brand-accent text-brand-bg' : 'bg-brand-primary text-brand-accent';
+  const quoteColor = isAccent ? 'text-brand-bg/20' : 'text-brand-accent/20';
+
+  return (
+    <div
+      style={{
+        opacity: visible ? 1 : 0,
+        transform: visible ? 'translateY(0) scale(1)' : 'translateY(12px) scale(0.97)',
+        transition: 'opacity 0.25s ease, transform 0.25s ease',
+      }}
+      onPointerDown={onPressStart}
+      onPointerUp={onPressEnd}
+      onPointerLeave={onPressEnd}
+    >
+      <div className={`relative pt-14 px-16 pb-14 rounded-lg shadow-xl ${bgColor} border border-black/5`}>
+        <div className="flex justify-between items-start mb-8">
+          <Quote size={13} className={quoteColor} />
+          <Quote size={13} className={`${quoteColor} rotate-180`} />
+        </div>
+        <p className="text-13 font-medium leading-snug font-body">{testimonial.text}</p>
+        <div className="mt-12 pt-8 border-t border-current/10">
+          <div className="font-serif font-black text-12 uppercase tracking-tighter">{testimonial.author}</div>
+          <div className="text-[10px] opacity-60 font-body uppercase tracking-widest mt-1">{testimonial.role}</div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ─── Main component ───────────────────────────────────────────────────────────
+
 interface TestimonialsProps {
   theme: Theme;
 }
 
 export const Testimonials: React.FC<TestimonialsProps> = ({ theme }) => {
-  // Fetch testimonials from API
   const { data: apiTestimonials, error } = useTestimonials();
 
-  // Map API data to component format, fallback on error
   const testimonials = React.useMemo(() => {
-    if (!apiTestimonials || error) {
-      return FALLBACK_TESTIMONIALS;
-    }
+    if (!apiTestimonials || error) return FALLBACK_TESTIMONIALS;
     return apiTestimonials.map((t: any) => ({
-      text: t.text,
-      author: t.author,
-      role: t.role,
-      color: t.color
+      text: t.text, author: t.author, role: t.role, color: t.color
     }));
   }, [apiTestimonials, error]);
 
-  // Triple the data to ensure the ticker never gaps even on large screens
+  // ── Mobile carousel state ──
+  const [isMobile, setIsMobile] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [visible, setVisible] = useState(true);
+  const [isPaused, setIsPaused] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 767px)');
+    const check = () => setIsMobile(mq.matches);
+    check();
+    mq.addEventListener('change', check);
+    return () => mq.removeEventListener('change', check);
+  }, []);
+
+  const advance = useCallback(() => {
+    setVisible(false);
+    setTimeout(() => {
+      setCurrentIndex(prev => (prev + 1) % testimonials.length);
+      setVisible(true);
+    }, 260);
+  }, [testimonials.length]);
+
+  useEffect(() => {
+    if (!isMobile || isPaused) return;
+    const timer = setInterval(advance, 3500);
+    return () => clearInterval(timer);
+  }, [isMobile, isPaused, advance]);
+
+  const handlePressStart = () => setIsPaused(true);
+  const handlePressEnd = () => setTimeout(() => setIsPaused(false), 2000);
+
+  // Desktop: triple data for seamless ticker
   const fullRow = [...testimonials, ...testimonials, ...testimonials];
 
   return (
-    <section className="py-64 md:py-128 overflow-hidden relative" style={{ backgroundColor: 'var(--color-surface)' }}>
-      <div className="text-center mb-16 px-24 reveal">
-        <h2 className="font-serif text-56 md:text-80 lg:text-[110px] xl:text-[120px] leading-[0.85] font-semibold tracking-tighter text-brand-primary">
+    <section className="py-32 md:py-128 overflow-hidden relative" style={{ backgroundColor: 'var(--color-surface)' }}>
+      <div className="text-center mb-12 md:mb-16 px-24 reveal">
+        <h2 className="font-serif text-[64px] md:text-80 lg:text-[110px] xl:text-[120px] leading-[0.85] font-semibold tracking-tighter text-brand-primary">
           What they say.
         </h2>
       </div>
 
-      <div className="relative">
-        {/* Single Row Ticker */}
-        <div className="flex overflow-hidden py-12">
-          <div className="flex animate-ticker hover:[animation-play-state:paused] items-center">
-            {fullRow.map((t, i) => (
-              <TestimonialCard key={`testimonial-${i}`} testimonial={t} index={i} />
-            ))}
-          </div>
-          {/* Duplicate for seamless infinite loop */}
-          <div className="flex animate-ticker hover:[animation-play-state:paused] items-center" aria-hidden="true">
-            {fullRow.map((t, i) => (
-              <TestimonialCard key={`testimonial-dup-${i}`} testimonial={t} index={i} />
+      {/* ── Mobile: single-card carousel ── */}
+      {isMobile ? (
+        <div className="px-20 pt-8">
+          <MobileCard
+            testimonial={testimonials[currentIndex]}
+            visible={visible}
+            onPressStart={handlePressStart}
+            onPressEnd={handlePressEnd}
+          />
+          {/* Progress dots */}
+          <div className="flex justify-center gap-8 mt-20">
+            {testimonials.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => { setVisible(false); setTimeout(() => { setCurrentIndex(i); setVisible(true); }, 260); }}
+                style={{
+                  width: i === currentIndex ? 24 : 8,
+                  height: 8,
+                  borderRadius: 4,
+                  background: i === currentIndex ? 'var(--color-accent, #FF3831)' : 'rgba(255,253,219,0.25)',
+                  border: 'none',
+                  cursor: 'pointer',
+                  transition: 'width 0.3s ease, background 0.3s ease',
+                  padding: 0,
+                }}
+              />
             ))}
           </div>
         </div>
-
-        {/* Edge Fades for visual depth */}
-        <div className="absolute inset-y-0 left-0 w-32 md:w-200 z-30 pointer-events-none" style={{ background: 'linear-gradient(to right, var(--color-surface), var(--color-surface) 20%, transparent)' }}></div>
-        <div className="absolute inset-y-0 right-0 w-32 md:w-200 z-30 pointer-events-none" style={{ background: 'linear-gradient(to left, var(--color-surface), var(--color-surface) 20%, transparent)' }}></div>
-      </div>
+      ) : (
+        /* ── Desktop: horizontal ticker ── */
+        <div className="relative">
+          <div className="flex overflow-hidden py-12">
+            <div className="flex animate-ticker hover:[animation-play-state:paused] items-center">
+              {fullRow.map((t, i) => <TestimonialCard key={`t-${i}`} testimonial={t} index={i} />)}
+            </div>
+            <div className="flex animate-ticker hover:[animation-play-state:paused] items-center" aria-hidden="true">
+              {fullRow.map((t, i) => <TestimonialCard key={`td-${i}`} testimonial={t} index={i} />)}
+            </div>
+          </div>
+          <div className="absolute inset-y-0 left-0 w-32 md:w-200 z-30 pointer-events-none" style={{ background: 'linear-gradient(to right, var(--color-surface), var(--color-surface) 20%, transparent)' }} />
+          <div className="absolute inset-y-0 right-0 w-32 md:w-200 z-30 pointer-events-none" style={{ background: 'linear-gradient(to left, var(--color-surface), var(--color-surface) 20%, transparent)' }} />
+        </div>
+      )}
     </section>
   );
 };

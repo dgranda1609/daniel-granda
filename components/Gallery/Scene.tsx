@@ -42,7 +42,7 @@ const NarrativeText = ({ text, scrollYProgress, start, end, highlightWord, align
       style={{ opacity, filter: blur }}
       className={`absolute ${alignClass} flex flex-col pointer-events-none max-w-[80vw] md:max-w-3xl`}
     >
-      <h2 className={`font-serif text-36 md:text-56 lg:text-[76px] font-medium tracking-tight ${textAlign} leading-[1.05] text-white mix-blend-difference drop-shadow-[0_4px_30px_rgba(0,0,0,0.8)]`}>
+      <h2 className={`font-serif text-36 md:text-56 lg:text-[76px] font-medium italic tracking-tight ${textAlign} leading-[1.05] text-brand-primary mix-blend-difference drop-shadow-[0_4px_30px_rgba(0,0,0,0.8)]`}>
         <WordReveal text={text} progress={wordProgress} highlightWord={highlightWord} />
       </h2>
     </motion.div>
@@ -141,7 +141,7 @@ const ProjectItem: React.FC<{ project: GalleryProject; index: number; scrollYPro
           className="w-full h-full object-cover grayscale contrast-125 brightness-75 group-hover:grayscale-0 transition-all duration-700 ease-out shadow-2xl"
           loading="lazy"
         />
-        <div className="absolute -bottom-12 left-0 text-white mix-blend-difference whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <div className="absolute -bottom-12 left-0 text-brand-primary mix-blend-difference whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <p className="text-[10px] uppercase tracking-[0.2em]">{project.category}</p>
           <h3 className="text-xl font-light uppercase tracking-tight">{project.title}</h3>
         </div>
@@ -191,10 +191,10 @@ export const Scene = ({ projects }: SceneProps) => {
              }}
              className="absolute inset-0 flex items-center justify-center pointer-events-none z-10"
            >
-             <div className="text-white text-center mix-blend-difference">
-               <p className="text-xs uppercase tracking-[0.5em] mb-6 text-gray-400">Portfolio</p>
+             <div className="text-brand-primary text-center mix-blend-difference">
+               <p className="text-xs uppercase tracking-[0.5em] mb-6 text-brand-primary opacity-50">Portfolio</p>
                <h1 className="text-6xl md:text-9xl font-serif font-light leading-[0.8]">
-                 Selected
+                 <span className="italic">Selected</span>
                  <br />
                  <span className="italic">Works</span>
                </h1>

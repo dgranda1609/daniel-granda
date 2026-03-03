@@ -60,7 +60,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
         </div>
         <h3 className="font-heading text-20 font-bold mb-4 group-hover:text-brand-accent transition-colors">{project.title}</h3>
         <p className="text-14 opacity-60 mb-8">{project.summary}</p>
-        <div className="flex gap-8">
+        <div className="flex flex-wrap gap-8">
           {project.tags.map((tag: string) => (
             <span key={tag} className="text-[10px] uppercase tracking-widest border border-brand-primary/20 px-8 py-2 rounded-full opacity-40">
               {tag}

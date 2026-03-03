@@ -125,17 +125,17 @@ export const Manifesto: React.FC<ManifestoProps> = ({ theme }) => {
 
           {/* Phase 1: The Setup */}
           <div
-            className="absolute inset-0 flex flex-col items-center justify-center px-6 md:px-64 transition-none"
+            className="absolute inset-0 flex flex-col items-center justify-center px-16 md:px-64 transition-none"
             style={{ opacity: phase1Opacity }}
           >
-            <h2 className="font-serif text-32 md:text-72 lg:text-[96px] font-medium tracking-tight text-center leading-[1.1] text-brand-primary max-w-4xl">
+            <h2 className="font-serif text-[52px] md:text-72 lg:text-[96px] font-medium tracking-tight text-center leading-[1.05] text-brand-primary max-w-4xl">
               <WordReveal
                 text="Everyone has the tools now."
                 progress={phase1WordProgress}
               />
             </h2>
             <p
-              className="mt-24 font-body text-16 md:text-28 text-brand-primary/50 text-center tracking-wide"
+              className="mt-24 font-body text-20 md:text-28 text-brand-primary/50 text-center tracking-wide"
               style={{
                 opacity: phase1SubProgress,
                 transform: `translateY(${(1 - phase1SubProgress) * 10}px)`,
@@ -147,10 +147,10 @@ export const Manifesto: React.FC<ManifestoProps> = ({ theme }) => {
 
           {/* Phase 2: The Leap */}
           <div
-            className="absolute inset-0 flex flex-col items-center justify-center px-6 md:px-64 transition-none"
+            className="absolute inset-0 flex flex-col items-center justify-center px-16 md:px-64 transition-none"
             style={{ opacity: phase2Opacity }}
           >
-            <h2 className="font-serif italic text-32 md:text-72 lg:text-[96px] font-medium tracking-tight text-center leading-[1.1] text-brand-primary max-w-5xl">
+            <h2 className="font-serif italic text-[52px] md:text-72 lg:text-[96px] font-medium tracking-tight text-center leading-[1.05] text-brand-primary max-w-5xl">
               What changes everything is the{' '}
               <span className="text-brand-accent not-italic font-bold">eye</span>{' '}
               behind it.
@@ -159,10 +159,10 @@ export const Manifesto: React.FC<ManifestoProps> = ({ theme }) => {
 
           {/* Phase 3: The Landing */}
           <div
-            className="absolute inset-0 flex flex-col items-center justify-center px-6 md:px-64 transition-none"
+            className="absolute inset-0 flex flex-col items-center justify-center px-16 md:px-64 transition-none"
             style={{ opacity: phase3Opacity }}
           >
-            <h2 className="font-serif text-32 md:text-72 lg:text-[110px] font-semibold tracking-tight text-center leading-[1.05] text-brand-primary max-w-5xl">
+            <h2 className="font-serif text-[52px] md:text-72 lg:text-[110px] font-semibold tracking-tight text-center leading-[1.05] text-brand-primary max-w-5xl">
               AI made me faster.
               <br />
               <span className="italic font-normal">
@@ -173,7 +173,7 @@ export const Manifesto: React.FC<ManifestoProps> = ({ theme }) => {
 
             {/* Credential Strip */}
             <div
-              className="mt-48 flex flex-wrap items-center justify-center gap-12 md:gap-24"
+              className="mt-16 md:mt-48 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 md:gap-24"
               style={{ opacity: credentialOpacity }}
             >
               {CREDENTIALS.map((cred, i) => (
@@ -182,7 +182,7 @@ export const Manifesto: React.FC<ManifestoProps> = ({ theme }) => {
                     {cred}
                   </span>
                   {i < CREDENTIALS.length - 1 && (
-                    <span className="text-brand-primary/20 text-12">·</span>
+                    <span className="hidden md:inline text-brand-primary/20 text-12">·</span>
                   )}
                 </React.Fragment>
               ))}
@@ -190,7 +190,7 @@ export const Manifesto: React.FC<ManifestoProps> = ({ theme }) => {
 
             {/* Project Stills Strip */}
             <div
-              className="mt-48 w-full overflow-hidden"
+              className="mt-16 md:mt-48 w-full overflow-hidden"
               style={{ opacity: stillsOpacity }}
             >
               <div className="flex animate-ticker items-center gap-16">

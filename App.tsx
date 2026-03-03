@@ -6,8 +6,8 @@ import { queryClient } from './lib/api';
 import { Home } from './pages/Home';
 import { Articles } from './pages/Articles';
 import { CaseStudy } from './pages/CaseStudy';
-
 import { CaseStudyNoir } from './pages/CaseStudyNoir';
+import { Admin } from './pages/Admin';
 
 const App: React.FC = () => {
   return (
@@ -18,6 +18,7 @@ const App: React.FC = () => {
           <Route path="/articles" element={<Articles />} />
           <Route path="/work/:slug" element={<CaseStudy />} />
           <Route path="/noir/:slug" element={<CaseStudyNoir />} />
+          <Route path="/admin/*" element={<Admin />} />
         </Routes>
       </Router>
     </QueryClientProvider>
