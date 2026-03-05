@@ -15,12 +15,16 @@ import { useTheme } from '../lib/useTheme';
 import { Scene, GalleryProject } from '../components/Gallery/Scene';
 
 const customGalleryProjects: GalleryProject[] = [
-  { id: '1', title: 'Levitation', category: 'Motion Design', image: '/images/selected-works/s1_shot5_levitation_1771633131236.png', year: '2026' },
-  { id: '2', title: 'Masterpiece', category: 'Art Direction', image: '/images/selected-works/s1_shot9_masterpiece_1771633199713.png', year: '2026' },
-  { id: '3', title: 'Grid', category: 'VFX', image: '/images/selected-works/s2_shot5_grid_1771633315783.png', year: '2026' },
-  { id: '4', title: 'Torrent', category: '3D Animation', image: '/images/selected-works/s2_shot2_torrent_1771633269371.png', year: '2026' },
-  { id: '5', title: 'Convergence', category: 'Direction', image: '/images/selected-works/s1_shot7_convergence_1771633164764.png', year: '2026' },
-  { id: '6', title: 'Material', category: 'Look Dev', image: '/images/selected-works/s2_shot4_material_1771633300053.png', year: '2026' }
+  { id: '1', title: 'First Look', category: 'Childhood', image: '/images/selected-works/story-01-child-bolex-camera.png', year: '2003' },
+  { id: '2', title: 'Daniel D.', category: 'Film Set', image: '/images/selected-works/story-02-child-director-chair.png', year: '2005' },
+  { id: '3', title: 'On Set', category: 'Early Years', image: '/images/selected-works/story-03-child-film-set-lights.jpeg', year: '2004' },
+  { id: '4', title: 'Camera Ready', category: 'Behind the Scenes', image: '/images/selected-works/story-04-child-camera-dolly.png', year: '2006' },
+  { id: '5', title: 'Peru Tiene Talento', category: 'Live Television', image: '/images/selected-works/story-05-live-tv-control-room.jpeg', year: '2012' },
+  { id: '6', title: 'On the Floor', category: 'Live Production', image: '/images/selected-works/story-06-live-tv-set-crew.jpeg', year: '2013' },
+  { id: '7', title: 'In Control', category: 'Broadcast', image: '/images/selected-works/story-07-broadcast-control-room.png', year: '2018' },
+  { id: '8', title: 'Coast Line', category: 'Documentary', image: '/images/selected-works/story-08-field-ocean-filming.jpeg', year: '2020' },
+  { id: '9', title: 'Andes', category: 'ILO Documentary', image: '/images/selected-works/story-09-andes-documentary.jpeg', year: '2022' },
+  { id: '10', title: 'The Moment', category: 'Cinematic', image: '/images/selected-works/story-10-wedding-bw-documentary.png', year: '2024' },
 ];
 
 export const Home: React.FC = () => {
