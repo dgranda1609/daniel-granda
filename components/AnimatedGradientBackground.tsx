@@ -17,13 +17,13 @@ const AnimatedGradientBackground: React.FC<AnimatedGradientBackgroundProps> = ({
     startingGap = 125,
     Breathing = true,
     gradientColors = [
-        "#FF3831",    // Brand accent - center
-        "#FF5A54",    // Lighter accent
-        "#FF3831",    // Brand accent
-        "#2A1A1A",    // Dark with red tint
-        "#1A1A1A",    // Slightly lighter
-        "#0F0F0F",    // Brand bg - edge
-        "#0F0F0F",    // Brand bg - outermost
+        "#E8734A",    // Brand accent - center (coral for light default)
+        "#F08050",    // Lighter accent
+        "#E8734A",    // Brand accent
+        "#E0DCD6",    // Warm surface transition
+        "#EAE8E3",    // Surface
+        "#F5F3EE",    // Brand bg - edge
+        "#F5F3EE",    // Brand bg - outermost
     ],
     gradientStops = [10, 25, 40, 55, 70, 85, 100],
     animationSpeed = 0.02,

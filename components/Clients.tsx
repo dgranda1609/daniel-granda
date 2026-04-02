@@ -46,7 +46,7 @@ const ClientItem: React.FC<{ client: { name: string; category: string } }> = ({ 
       {/* Hover Card — desktop only, follows cursor */}
       <div
         className={`hidden md:flex absolute top-0 left-0 z-50 pointer-events-none
-                   w-[140px] h-[140px] md:w-[170px] md:h-[170px] bg-brand-accent rounded-xl shadow-[0_20px_60px_rgba(255,56,49,0.5)]
+                   w-[140px] h-[140px] md:w-[170px] md:h-[170px] bg-brand-accent rounded-xl shadow-[0_20px_60px_rgba(var(--color-accent-rgb),0.5)]
                    flex-col items-center justify-center transition-all duration-300 ease-out
                    ${isHovered ? 'opacity-100 scale-100 rotate-0' : 'opacity-0 scale-75 rotate-3'}`}
         style={{

@@ -53,8 +53,8 @@ const TestimonialCard: React.FC<{ testimonial: any; index: number }> = ({ testim
   const bgColor = isAccent ? 'bg-brand-accent text-brand-bg' : 'bg-brand-primary text-brand-accent';
   const quoteColor = isAccent ? 'text-brand-bg/20' : 'text-brand-accent/20';
   const glowShadow = isAccent
-    ? 'hover:shadow-[0_0_50px_12px_rgba(255,56,49,0.25)]'
-    : 'hover:shadow-[0_0_50px_12px_rgba(255,56,49,0.35)]';
+    ? 'hover:shadow-[0_0_50px_12px_rgba(var(--color-accent-rgb),0.25)]'
+    : 'hover:shadow-[0_0_50px_12px_rgba(var(--color-accent-rgb),0.35)]';
 
   return (
     <div className={`flex-shrink-0 w-[240px] md:w-[320px] mx-8 md:mx-20 ${rotation}`}>

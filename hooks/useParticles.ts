@@ -11,9 +11,10 @@ export interface Particle {
   opacity: number;
 }
 
-const RED = '#FF3831';
+const ACCENT_LIGHT = '#E8734A';
+const ACCENT_DARK = '#FF3831';
 
-export function createParticle(width: number, height: number, progress: number, particleColor: string): Particle {
+export function createParticle(width: number, height: number, progress: number, particleColor: string, accentColor: string = ACCENT_DARK): Particle {
   const angle = Math.random() * Math.PI * 2;
   const radius = Math.random() * Math.max(width, height) * 0.6;
   const cx = width / 2;
@@ -27,7 +28,7 @@ export function createParticle(width: number, height: number, progress: number, 
     prevX: cx + Math.cos(angle) * radius,
     prevY: cy + Math.sin(angle) * radius,
     speed: 0.5 + Math.random() * 2,
-    color: Math.random() > 0.7 ? RED : particleColor,
+    color: Math.random() > 0.7 ? accentColor : particleColor,
     opacity: 0.1 + Math.random() * 0.4,
   };
 }
@@ -40,7 +41,8 @@ export function useCanvasAnimation(
   canvasBg: string = '#0F0F0F',
   particleColor: string = '#FFFDDB',
   mode: ParticleMode = 'manifesto',
-  velocity: number = 0 // Optional parameter for gallery mode
+  velocity: number = 0, // Optional parameter for gallery mode
+  accentColor: string = ACCENT_DARK
 ) {
   const particlesRef = useRef<Particle[]>([]);
   const animFrameRef = useRef<number>(0);
@@ -66,7 +68,7 @@ export function useCanvasAnimation(
     // Gallery used 250/100, increased by 1/3rd to ~350/135
     const count = mode === 'gallery' ? (isMobile ? 135 : 350) : (isMobile ? 50 : 120);
     particlesRef.current = Array.from({ length: count }, () =>
-      createParticle(canvas.offsetWidth, canvas.offsetHeight, 0, particleColor)
+      createParticle(canvas.offsetWidth, canvas.offsetHeight, 0, particleColor, accentColor)
     );
 
     return () => {
@@ -189,9 +191,9 @@ export function useCanvasAnimation(
                     : 1 - (progress - 0.7) * 6.67;
         
             const gradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, w * 0.3);
-            gradient.addColorStop(0, `rgba(255, 56, 49, ${0.15 * glowIntensity})`);
-            gradient.addColorStop(0.5, `rgba(255, 56, 49, ${0.05 * glowIntensity})`);
-            gradient.addColorStop(1, 'rgba(255, 56, 49, 0)');
+            gradient.addColorStop(0, `${accentColor}${Math.round(0.15 * glowIntensity * 255).toString(16).padStart(2, '0')}`);
+            gradient.addColorStop(0.5, `${accentColor}${Math.round(0.05 * glowIntensity * 255).toString(16).padStart(2, '0')}`);
+            gradient.addColorStop(1, `${accentColor}00`);
             ctx.globalAlpha = 1;
             ctx.fillStyle = gradient;
             ctx.fillRect(0, 0, w, h);

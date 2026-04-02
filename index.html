@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="light">
 
 <head>
   <meta charset="UTF-8" />
@@ -19,9 +19,10 @@
           colors: {
             brand: {
               primary: 'var(--color-primary)',
-              accent: '#FF3831',
+              accent: 'var(--color-accent)',
               bg: 'var(--color-bg)',
               secondary: 'var(--color-secondary)',
+              surface: 'var(--color-surface)',
               text: 'var(--color-primary)',
             }
           },
@@ -60,6 +61,8 @@
     /* ─── Theme Variables ─────────────────────────────────────── */
     :root {
       --color-primary: #FFFDDB;
+      --color-accent: #FF3831;
+      --color-accent-rgb: 255, 56, 49;
       --color-bg: #140c0c;
       --color-secondary: #3F3F46;
       --color-surface: #0F0F0F;
@@ -72,6 +75,8 @@
 
     :root.light {
       --color-primary: #1A1A1A;
+      --color-accent: #E8734A;
+      --color-accent-rgb: 232, 115, 74;
       --color-bg: #F5F3EE;
       --color-secondary: #A0A0A0;
       --color-surface: #EAE8E3;
@@ -128,7 +133,7 @@
     }
 
     ::-webkit-scrollbar-thumb:hover {
-      background: #FF3831;
+      background: var(--color-accent);
     }
 
     .film-grain {

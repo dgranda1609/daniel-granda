@@ -1,4 +1,5 @@
 import React, { useMemo, useEffect, useRef, useState } from "react";
+import type { AboutCopy } from "../lib/copyVariants";
 
 const PORTRAIT_VIDEOS = [
   "/images/me-redbg-v1.webp",
@@ -67,7 +68,11 @@ const AnimatedStat: React.FC<{
   );
 };
 
-export const About: React.FC = () => {
+interface AboutProps {
+  copy?: AboutCopy;
+}
+
+export const About: React.FC<AboutProps> = ({ copy }) => {
   const selectedVideo = useMemo(() => {
     const randomIndex = Math.floor(Math.random() * PORTRAIT_VIDEOS.length);
     return PORTRAIT_VIDEOS[randomIndex];
@@ -124,7 +129,7 @@ export const About: React.FC = () => {
                 ))}
               </div>
             </div>
-            <div className="relative z-10 w-64 h-64 md:w-80 md:h-80 rounded-full overflow-hidden shadow-[0_0_80px_rgba(255,56,49,0.4)] border-4 border-brand-accent">
+            <div className="relative z-10 w-64 h-64 md:w-80 md:h-80 rounded-full overflow-hidden shadow-[0_0_80px_rgba(var(--color-accent-rgb),0.4)] border-4 border-brand-accent">
               <img
                 src={selectedVideo}
                 alt="Daniel Granda"
@@ -136,7 +141,7 @@ export const About: React.FC = () => {
 
         {/* Headline */}
         <h2 className="font-serif text-56 md:text-80 lg:text-[110px] xl:text-[120px] font-medium tracking-tight leading-[1.05] mb-24 text-brand-primary px-24">
-          10 years of cinema. AI-first since day one.
+          {copy?.headline || "I've been doing this my whole life."}
         </h2>
 
         {/* Decorative Divider */}
@@ -148,28 +153,71 @@ export const About: React.FC = () => {
 
         {/* Bio Text */}
         <div className="font-serif text-20 md:text-28 lg:text-32 leading-[1.4] opacity-90 mb-48 max-w-4xl mx-auto px-24 text-left space-y-24">
-          <p>
-            I'm Daniel Granda — an independent video producer and AI visual
-            strategist based in South Florida. Being a photographer and
-            videographer since I was little gives me that core foundation and
-            view, which I now use with AI to run fast, iterate, and expand the
-            possibilities. I design AI-first production systems that ship 100+
-            brand assets monthly while cutting turnaround by 35%. Recent
-            production partnerships include{" "}
-            <strong className="text-brand-accent">DTC brands</strong>,
-            international NGOs, and sports organizations.
-          </p>
-          <p>
-            Before that: a documentary series for the{" "}
-            <strong>United Nations</strong> across three ecosystems. A{" "}
-            <strong>Cannes World Film Festival</strong> finalist. 150+ videos at
-            Miguel Angel Productions. Campaigns for <strong>Microsoft</strong>,{" "}
-            <strong>The North Face</strong>, and America Television.
-          </p>
-          <p className="italic opacity-80">
-            I use AI every day. But AI doesn't replace knowing when to cut, how
-            to light, or why a story needs silence.
-          </p>
+          {copy?.paragraphs ? (
+            copy.paragraphs.map((para, i) => {
+              let content: React.ReactNode = para.text;
+              if (para.boldWords && para.boldWords.length > 0) {
+                const parts: React.ReactNode[] = [];
+                let remaining = para.text;
+                para.boldWords.forEach((word) => {
+                  const idx = remaining.indexOf(word);
+                  if (idx >= 0) {
+                    if (idx > 0) parts.push(remaining.slice(0, idx));
+                    parts.push(<strong key={word}>{word}</strong>);
+                    remaining = remaining.slice(idx + word.length);
+                  }
+                });
+                if (remaining) parts.push(remaining);
+                content = <>{parts}</>;
+              }
+              return (
+                <p key={i} className={para.italic ? 'italic opacity-80' : ''}>
+                  {content}
+                </p>
+              );
+            })
+          ) : (
+            <>
+              <p>
+                When I was a kid in Lima, my mom would drop me off at my uncle's
+                office when she needed a babysitter. The thing was - my uncles and
+                grandfather were filmmakers. So "babysitting" meant watching them
+                run commercial shoots, rig lighting setups, and argue about camera
+                angles. I was hooked before I even knew what a producer was.
+              </p>
+              <p>
+                By high school I had my first camera and was making short films,
+                event videos, anything I could point a lens at. I studied film at
+                the University of Lima, then dove straight in - assistant producing
+                on Peru's Got Talent franchise at Latina Television, working my way
+                from camera assistant to camera operator at America TV. All while
+                running freelance projects on the side, because I couldn't help it.
+              </p>
+              <p>
+                Eventually I partnered with friends to build our own agency. We
+                landed <strong>Microsoft</strong>, <strong>The North Face</strong>,{' '}
+                <strong>KFC</strong>, and others. On my own, I picked up documentary
+                work for the{' '}
+                <strong>United Nations' International Labour Organization</strong> -
+                shooting across three ecosystems in the Andes, Amazon, and coast.
+                That series was adopted by five NGOs.
+              </p>
+              <p>
+                Today I'm based in Miami, working independently as a video producer
+                and AI visual strategist. My last full-time role was Art and
+                Photography Manager at <strong>Kreyol Essence</strong>. Now I build
+                AI-powered production systems that ship 100+ brand assets monthly -
+                but everything I make still runs through the same instinct I
+                developed watching my uncles work.
+              </p>
+              <p className="italic opacity-80">
+                I use AI every single day. But AI doesn't know when a story needs
+                silence, how to light a face so it tells the truth, or why
+                sometimes the best edit is the one you don't make. That part is
+                mine.
+              </p>
+            </>
+          )}
         </div>
 
         {/* Animated Stats Row */}
@@ -186,7 +234,7 @@ export const About: React.FC = () => {
         <a
           href="/resume/2026_Daniel_Granda_Resume.pdf"
           download
-          className="inline-block bg-brand-accent text-white px-32 py-16 font-serif font-bold text-20 md:text-36 lg:text-[44px] transition-transform hover:scale-105 active:scale-95 shadow-[0_0_30px_rgba(255,56,49,0.3)] no-underline"
+          className="inline-block bg-brand-accent text-white px-32 py-16 font-serif font-bold text-20 md:text-36 lg:text-[44px] transition-transform hover:scale-105 active:scale-95 shadow-[0_0_30px_rgba(var(--color-accent-rgb),0.3)] no-underline"
         >
           Download Resume
         </a>

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import type { Theme } from '../lib/useTheme';
+import type { ManifestoCopy } from '../lib/copyVariants';
 
 // ─── Particle System for Lightspeed Tunnel ───────────────────────────────────
 
@@ -42,7 +43,6 @@ export const WordReveal: React.FC<{
 // ─── Credential Strip ────────────────────────────────────────────────────────
 
 const CREDENTIALS = [
-  'Cannes Finalist',
   '100+ Monthly Assets',
   '10+ Festival Selections',
   'AI-First Workflows',
@@ -65,15 +65,17 @@ const PROJECT_STILLS = [
 
 interface ManifestoProps {
   theme: Theme;
+  copy?: ManifestoCopy;
 }
 
-export const Manifesto: React.FC<ManifestoProps> = ({ theme }) => {
+export const Manifesto: React.FC<ManifestoProps> = ({ theme, copy }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [progress, setProgress] = useState(0);
 
   const canvasBg = theme === 'light' ? '#EAE8E3' : '#0F0F0F';
   const particleColor = theme === 'light' ? '#1A1A1A' : '#FFFDDB';
+  const accentColor = theme === 'light' ? '#E8734A' : '#FF3831';
 
   useEffect(() => {
     const handleScroll = () => {
@@ -93,7 +95,7 @@ export const Manifesto: React.FC<ManifestoProps> = ({ theme }) => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  useCanvasAnimation(canvasRef, progress, canvasBg, particleColor);
+  useCanvasAnimation(canvasRef, progress, canvasBg, particleColor, 'manifesto', 0, accentColor);
 
   // Phase opacities
   const phase1Opacity = progress < 0.35 ? Math.min(1, progress * 4) : Math.max(0, 1 - (progress - 0.35) * 6);
@@ -130,7 +132,7 @@ export const Manifesto: React.FC<ManifestoProps> = ({ theme }) => {
           >
             <h2 className="font-serif text-[52px] md:text-72 lg:text-[96px] font-medium tracking-tight text-center leading-[1.05] text-brand-primary max-w-4xl">
               <WordReveal
-                text="Everyone has the tools now."
+                text={copy?.phase1 || "I've been behind a camera ever since I was born."}
                 progress={phase1WordProgress}
               />
             </h2>
@@ -141,7 +143,7 @@ export const Manifesto: React.FC<ManifestoProps> = ({ theme }) => {
                 transform: `translateY(${(1 - phase1SubProgress) * 10}px)`,
               }}
             >
-              Same prompts. Same presets. Same outputs.
+              {copy?.phase1Sub || 'I learned this craft by hand, long before AI became the norm.'}
             </p>
           </div>
 
@@ -151,9 +153,9 @@ export const Manifesto: React.FC<ManifestoProps> = ({ theme }) => {
             style={{ opacity: phase2Opacity }}
           >
             <h2 className="font-serif italic text-[52px] md:text-72 lg:text-[96px] font-medium tracking-tight text-center leading-[1.05] text-brand-primary max-w-5xl">
-              What changes everything is the{' '}
-              <span className="text-brand-accent not-italic font-bold">eye</span>{' '}
-              behind it.
+              {copy?.phase2Pre || 'Now AI can speed production up, and many say it will replace what creators'}{' '}
+              <span className="text-brand-accent not-italic font-bold">{copy?.phase2Accent || 'make'}</span>{' '}
+              {copy?.phase2Post || '.'}
             </h2>
           </div>
 
@@ -163,11 +165,11 @@ export const Manifesto: React.FC<ManifestoProps> = ({ theme }) => {
             style={{ opacity: phase3Opacity }}
           >
             <h2 className="font-serif text-[52px] md:text-72 lg:text-[110px] font-semibold tracking-tight text-center leading-[1.05] text-brand-primary max-w-5xl">
-              AI made me faster.
+              {copy?.phase3Line1 || 'I see it as a tool in human hands,'}
               <br />
               <span className="italic font-normal">
-                A decade of cinema makes the work{' '}
-                <span className="text-brand-accent font-bold not-italic">matter.</span>
+                {copy?.phase3Line2 || 'helping us shape every frame we'}{' '}
+                <span className="text-brand-accent font-bold not-italic">{copy?.phase3Accent || 'take.'}</span>
               </span>
             </h2>
 

@@ -145,7 +145,7 @@ export const FALLBACK_PROJECTS: Record<string, any> = {
     imageUrl: '/images/ILO-hero.gif',
     client: 'United Nations / ILO',
     outcome: '100k+ Views',
-    tags: ['Documentary', 'UN/ILO', 'Cannes']
+    tags: ['Documentary', 'UN/ILO']
   },
   'dinamo-zagreb': {
     title: 'Dinamo Zagreb',

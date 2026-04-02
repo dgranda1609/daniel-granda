@@ -30,7 +30,7 @@ The site positions Daniel as a **cinematic video producer and AI-first creative 
 ### Professional Identity
 - 15+ years in video production, motion graphics, and editorial storytelling
 - Currently Lead Video & Media Producer at **Kreyol Essence** (Shark Tank winner, Black Ambition 2024 & Beauty Matter 2025 Finalist) — producing 100+ assets/month
-- Award-winning documentary work: **Cannes World Film Festival finalist**, 10+ festival selections, Impact Doc Awards winner
+- Award-winning documentary work: 10+ festival selections, Impact Doc Awards winner
 - Clients include **Microsoft**, **The North Face**, **United Nations/ILO**, **America Television/TELEFE**
 - Bilingual: English (Professional Advanced) / Spanish (Native)
 
@@ -101,26 +101,38 @@ The site positions Daniel as a **cinematic video producer and AI-first creative 
 ### Fonts
 | Font | Role | Weights |
 |------|------|---------|
-| Archivo | Headings (`font-heading`) | 400, 600, 800 |
-| Fraunces | Serif display (`font-serif`) | Variable |
+| Fraunces | Primary display — headlines, CTAs (`font-serif`) | Variable (500-700 for headlines) |
 | Space Grotesk | Body text (`font-body`) | 300, 400, 500, 700 |
+| Archivo | Labels, tags, credentials (`font-heading`) | 400, 600, 800 |
 | Tan Memories | Custom accent (local files in `Fonts/`) | Regular, Italic |
 
-### Brand Colors (Tailwind Config)
+### Brand Colors (Tailwind Config — Dual Mode)
+
+**Light Mode (Default):**
+| Token | Hex | Usage |
+|-------|-----|-------|
+| `brand-primary` | `#1A1A1A` | Text, headings (near-black) |
+| `brand-accent` | `#E8734A` | CTAs, highlights, interactive (warm coral from sphere logo) |
+| `brand-bg` | `#F5F3EE` | Page background (warm off-white) |
+| `brand-secondary` | `#A0A0A0` | Muted text, borders |
+| `brand-surface` | `#EAE8E3` | Card backgrounds, elevated surfaces |
+
+**Dark Mode:**
 | Token | Hex | Usage |
 |-------|-----|-------|
 | `brand-primary` | `#FFFDDB` | Text, light elements (warm cream) |
 | `brand-accent` | `#FF3831` | CTAs, highlights, interactive (bold red) |
-| `brand-bg` | `#0F0F0F` | Page background (near-black) |
+| `brand-bg` | `#140c0c` | Page background (cinematic dark) |
 | `brand-secondary` | `#3F3F46` | Subtle text, borders (neutral gray) |
+| `brand-surface` | `#0F0F0F` | Deepest surfaces |
 
 ### Brand Personality
 | Attribute | Value |
 |-----------|-------|
 | Tone | Bold, confident, cinematic |
 | Energy | High |
-| Typography style | Serif headlines + grotesque body = editorial authority |
-| Visual style | Dark mode, film-grade color, red accent energy |
+| Typography style | Serif headlines (Fraunces) + grotesque body (Space Grotesk) = editorial authority |
+| Visual style | Light-mode-first, warm coral accents; cinematic dark mode alternate |
 | Border Radius | 0px (sharp, editorial) |
 | Base spacing unit | 4px |
 
@@ -302,13 +314,13 @@ This Claude instance operates as a **creative director + full-stack developer** 
 - Copy tone: confident, concise, results-oriented, cinematic vocabulary
 
 ### 4. Creative Direction for AI Image Generation
-- Generate prompts for brand imagery (Midjourney, Flux, Stable Diffusion, ComfyUI)
-- Maintain visual consistency using a prompt style guide:
-  - **Lighting**: dramatic side lighting, cinema-grade, chiaroscuro, neon rim light
-  - **Color palette**: `#0F0F0F` deep blacks, `#FF3831` accent red, `#FFFDDB` warm cream highlights
-  - **Mood**: cinematic, bold, futuristic-editorial, high-contrast
+- Generate prompts for brand imagery (Midjourney, Flux, Stable Diffusion, ComfyUI, Nano Banana 2)
+- Maintain visual consistency using mode-appropriate prompt style guide:
+  - **Light mode**: warm directional lighting, `#F5F3EE` off-white, `#E8734A` coral accents, `#1A1A1A` near-black
+  - **Dark mode**: dramatic chiaroscuro, `#140c0c` deep dark, `#FF3831` red accents, `#FFFDDB` warm cream
+  - **Mood**: cinematic, bold, editorial, high-contrast
   - **Framing**: editorial photography, widescreen compositions, shallow depth of field
-  - **Texture**: film grain, analog-digital hybrid, chrome/metallic accents
+  - **Texture**: film grain, analog-digital hybrid
 - Compare and evaluate generated images against brand standards
 - Look for inspiration from award-winning portfolio sites, film titles, and motion design
 
@@ -330,17 +342,26 @@ This Claude instance operates as a **creative director + full-stack developer** 
 
 ### Visual Identity System
 ```
-PRIMARY PALETTE
+LIGHT MODE PALETTE (DEFAULT)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  Background     #0F0F0F    Near-black, cinematic depth
+  Background     #F5F3EE    Warm off-white
+  Text/Primary   #1A1A1A    Near-black, editorial authority
+  Accent         #E8734A    Warm coral (from sphere logo)
+  Secondary      #A0A0A0    Muted borders, supporting
+  Surface        #EAE8E3    Cards, elevated surfaces
+
+DARK MODE PALETTE (CINEMATIC)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Background     #140c0c    Cinematic depth
   Text/Primary   #FFFDDB    Warm cream, editorial warmth
   Accent         #FF3831    Bold red, energy & action
-  Secondary      #3F3F46    Neutral gray, supporting elements
+  Secondary      #3F3F46    Neutral gray, supporting
+  Surface        #0F0F0F    Deepest surface
 
 TYPOGRAPHY
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  Headlines      Archivo (800)       Sans-serif, bold authority
-  Display        Fraunces (variable) Serif, editorial elegance
+  Headlines      Fraunces (500-700)  Serif, primary display font
+  Labels/Tags    Archivo (400-600)   Sans-serif, UPPERCASE credentials
   Body           Space Grotesk       Grotesque, clean readability
   Accent         Tan Memories        Custom serif, personality
 
@@ -348,44 +369,52 @@ DESIGN PRINCIPLES
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   Corners        Sharp (0px radius)   Editorial, confident
   Motion         Purposeful, cinematic Every animation tells a story
-  Contrast       High                 Dark bg + light text + red pops
+  Contrast       High                 Strong text/bg contrast in both modes
   Density        Generous whitespace   Let content breathe
-  Photography    Cinematic, contrasty  Red-tinted portraits, moody project shots
+  Photography    Cinematic, contrasty  Warm coral highlights (light), red rim lights (dark)
 ```
 
 ### AI Image Prompt Style Guide
-When generating images for this brand, use these consistent modifiers:
+When generating images for this brand, use mode-appropriate modifiers:
 
 ```
-UNIVERSAL MODIFIERS (append to all prompts):
+LIGHT MODE MODIFIERS:
+  --style: cinematic editorial photography, warm and airy
+  --lighting: dramatic but warm, directional window light, coral highlights
+  --palette: warm off-white (#F5F3EE), near-black (#1A1A1A), warm coral (#E8734A)
+  --mood: confident, warm, editorial, refined
+  --texture: subtle film grain, high contrast
+  --framing: editorial composition, rule of thirds, generous negative space
+
+DARK MODE MODIFIERS:
   --style: cinematic editorial photography
   --lighting: dramatic chiaroscuro, deep shadows, warm highlights
-  --palette: deep black (#0F0F0F), bold red (#FF3831), warm cream (#FFFDDB)
-  --mood: confident, bold, futuristic, editorial
-  --texture: subtle film grain, high contrast
+  --palette: deep dark (#140c0c), bold red (#FF3831), warm cream (#FFFDDB)
+  --mood: confident, bold, futuristic, cinematic
+  --texture: film grain, high contrast
   --framing: editorial composition, rule of thirds, negative space
 
 FOR PORTRAITS:
-  Add: shallow depth of field, red-tinted rim light, dark moody background,
+  Add: shallow depth of field, rim light (coral for light / red for dark),
        studio quality, professional headshot, looking at camera
 
 FOR PROJECT THUMBNAILS:
   Add: widescreen 16:9, product photography meets film still,
-       dramatic lighting on subject, dark environment, accent color highlight
+       dramatic lighting on subject, accent color highlight
 
 FOR ABSTRACT/BRAND TEXTURES:
-  Add: generative art, organic flow, dark base with red energy accents,
+  Add: generative art, organic flow, accent energy accents,
        minimal, geometric-organic hybrid, data visualization aesthetic
 ```
 
 ### Inspiration References
 The `design-inspo/` folder contains approved reference screenshots from the **Griflan** creative studio site, which established the visual direction:
-- Dark mode with warm cream text and red accent buttons
 - Serif + sans-serif type pairing for editorial authority
 - Project grids with hover-reveal interactions
 - Physics-based interactive tags for skill/service sections
 - Scroll-driven hero with expanding media content
 - Breathing gradient footer with bold CTA
+- Sharp 0px radius on all elements
 
 ---
 
@@ -522,7 +551,8 @@ pm2 restart portfolio-api --update-env
 ### When Making Design Decisions
 - Reference `design-inspo/` screenshots for approved aesthetic direction
 - Stay within the brand color palette — no new colors without explicit approval
-- Typography hierarchy: Archivo for bold headlines, Fraunces for editorial display, Space Grotesk for body
+- Typography hierarchy: Fraunces for headlines/CTAs (primary display), Archivo for labels/tags (UPPERCASE), Space Grotesk for body
+- Light mode is the default; dark mode is the cinematic alternate
 - Sharp corners (0px radius) — this is an editorial brand, not a friendly SaaS
 - Every interaction should feel cinematic and intentional
 
@@ -613,7 +643,7 @@ This history reveals Daniel's positioning range: from DTC social content to docu
 - Never commit or push unless asked
 - Never expose personal contact info in code comments or logs
 - Keep the site fast — performance IS the portfolio
-- The brand is cinematic, bold, and editorial — never cutesy, rounded, or pastel
+- The brand is cinematic, bold, and editorial — never cutesy, rounded, or pastel. Light mode is default, dark is cinematic alternate
 - When in doubt about design direction, reference `design-inspo/` screenshots
 - Always delegate complex creative direction to the `art-director` agent
 - Always delegate complex code implementations to the `code-master` agent

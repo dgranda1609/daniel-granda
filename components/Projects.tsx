@@ -2,10 +2,11 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useProjects } from '../lib/hooks/useApi';
+import type { ProjectsCopy } from '../lib/copyVariants';
 
 // Fallback data for offline/error states
 const FALLBACK_PROJECTS = [
-  { id: '1', title: 'ILO Documentary Series', summary: '3-episode documentary for the United Nations. Andes, Amazon & Coast. Adopted by 5 NGOs. 100k+ views.', tags: ['Documentary', 'UN/ILO', 'Cannes'], imageUrl: '/images/ILO-hero.gif', slug: 'ilo-documentary-series' },
+  { id: '1', title: 'ILO Documentary Series', summary: '3-episode documentary for the United Nations. Andes, Amazon & Coast. Adopted by 5 NGOs. 100k+ views.', tags: ['Documentary', 'UN/ILO'], imageUrl: '/images/ILO-hero.gif', slug: 'ilo-documentary-series' },
   { id: '2', title: 'Dinamo Zagreb', summary: 'Motion graphics and visual identity system for European football club.', tags: ['Motion', 'Brand Identity', 'Sports'], imageUrl: '/images/dinamo-hero.gif', slug: 'dinamo-zagreb' },
   { id: '3', title: 'Miami Weddings', summary: 'Luxury wedding cinematography. Multi-cam, same-day edits, cinematic color.', tags: ['Cinematography', 'Editing', 'Color'], imageUrl: '/images/miami-weddings-hero.gif', slug: 'miami-weddings' },
   { id: '4', title: 'Alternative Audiovisual', summary: 'Creative studio: brand films, music videos, and commercial production.', tags: ['Production', 'Direction', 'Creative'], imageUrl: '/images/alternative-audiovisual-hero.jpg', slug: 'alternative-audiovisual' },
@@ -72,7 +73,17 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
   );
 };
 
-export const Projects: React.FC = () => {
+interface ProjectsProps {
+  copy?: ProjectsCopy | null;
+}
+
+export const Projects: React.FC<ProjectsProps> = ({ copy }) => {
+  const resolvedCopy: ProjectsCopy = copy || {
+    headline: 'Work that shaped me.',
+    subtitle:
+      "Every project here taught me something I couldn't have learned any other way. From UN documentaries in the Peruvian Amazon to AI production pipelines for beauty brands - this is the work that made me who I am.",
+  };
+
   // Fetch projects from API
   const { data: apiProjects, isLoading, error } = useProjects();
 
@@ -95,6 +106,14 @@ export const Projects: React.FC = () => {
   return (
     <section id="work" className="pt-12 pb-64 px-24 md:px-64 bg-brand-bg">
       <div className="max-w-6xl mx-auto">
+        <div className="text-center mb-48 reveal">
+          <h2 className="font-serif text-40 md:text-80 lg:text-[110px] font-medium tracking-tight leading-[1.05] mb-24 text-brand-primary">
+            {resolvedCopy.headline}
+          </h2>
+          <p className="font-serif text-20 md:text-28 opacity-70 max-w-3xl mx-auto">
+            {resolvedCopy.subtitle}
+          </p>
+        </div>
         {isLoading ? (
           <div className="flex justify-center items-center py-64">
             <div className="text-brand-primary/40">Loading projects...</div>

@@ -98,7 +98,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onContactClick, theme, onThemeTo
           <ThemeToggle theme={theme} onToggle={onThemeToggle} />
           <button
             onClick={onContactClick}
-            className="hidden md:block bg-brand-accent text-white px-16 py-8 md:px-24 md:py-12 font-serif font-black text-13 md:text-20 leading-none transition-all hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(255,56,49,0.3)]"
+            className="hidden md:block bg-brand-accent text-white px-16 py-8 md:px-24 md:py-12 font-serif font-black text-13 md:text-20 leading-none transition-all hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(var(--color-accent-rgb),0.3)]"
           >
             Let's Connect
           </button>
@@ -136,7 +136,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onContactClick, theme, onThemeTo
         >Articles</Link>
         <button
           onClick={() => { onContactClick(); closeMenu(); }}
-          className="mt-16 bg-brand-accent text-white px-48 py-16 font-serif font-black text-24 transition-all active:scale-95 shadow-[0_0_30px_rgba(255,56,49,0.3)]"
+          className="mt-16 bg-brand-accent text-white px-48 py-16 font-serif font-black text-24 transition-all active:scale-95 shadow-[0_0_30px_rgba(var(--color-accent-rgb),0.3)]"
         >
           Let's Connect
         </button>

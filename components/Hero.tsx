@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import type { HeroCopy } from '../lib/copyVariants';
 
 const Squiggle = () => (
   <svg width="48" height="12" viewBox="0 0 48 12" fill="none" xmlns="http://www.w3.org/2000/svg" className="inline-block mx-8 text-brand-accent">
@@ -6,7 +7,11 @@ const Squiggle = () => (
   </svg>
 );
 
-export const Hero: React.FC = () => {
+interface HeroProps {
+  copy?: HeroCopy;
+}
+
+export const Hero: React.FC<HeroProps> = ({ copy }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [progress, setProgress] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
@@ -66,20 +71,34 @@ export const Hero: React.FC = () => {
               transform: `translateY(${progress * -100}px)`
             }}
           >
-            <h1 className="font-serif text-36 md:text-[96px] lg:text-[110px] leading-[0.85] font-semibold tracking-tighter">
-              I make films, build systems, <br />
-              and ship a hundred <br />
-              <span className="flex items-center justify-center">
-                <Squiggle />
-                <span className="italic font-normal">assets a month.</span>
-                <Squiggle />
-              </span>
+            <h1 className="font-serif text-32 md:text-[80px] lg:text-[94px] leading-[0.9] font-semibold tracking-tight">
+              {copy ? (
+                <>
+                  {copy.headline[0]} <br />
+                  {copy.headline[1]} <br />
+                  <span className="flex items-center justify-center">
+                    <Squiggle />
+                    <span className="italic font-normal">{copy.headline[2]}</span>
+                    <Squiggle />
+                  </span>
+                </>
+              ) : (
+                <>
+                  I grew up on film sets. <br />
+                  Now I build the systems <br />
+                  <span className="flex items-center justify-center">
+                    <Squiggle />
+                    <span className="italic font-normal">that run them.</span>
+                    <Squiggle />
+                  </span>
+                </>
+              )}
             </h1>
             {/* Credential Ticker */}
             <div className="mt-16 overflow-hidden w-full max-w-3xl mx-auto">
               <div className="flex animate-ticker items-center whitespace-nowrap opacity-40">
-                {['Cannes World Film Festival', 'Microsoft', 'United Nations', 'The North Face', '100+ Monthly Assets', 'Impact Doc Awards', '10+ Festival Selections',
-                  'Cannes World Film Festival', 'Microsoft', 'United Nations', 'The North Face', '100+ Monthly Assets', 'Impact Doc Awards', '10+ Festival Selections'].map((cred, i) => (
+                {['Microsoft', 'United Nations', 'The North Face', '100+ Monthly Assets', 'Impact Doc Awards', '10+ Festival Selections',
+                  'Microsoft', 'United Nations', 'The North Face', '100+ Monthly Assets', 'Impact Doc Awards', '10+ Festival Selections'].map((cred, i) => (
                     <span key={i} className="text-11 uppercase tracking-[0.2em] font-heading font-medium mx-16">{cred}<span className="mx-16 opacity-40">·</span></span>
                   ))}
               </div>
@@ -96,15 +115,15 @@ export const Hero: React.FC = () => {
                 transform: `translateX(${progress * -50}px)`
               }}
             >
-              <h2 className="font-serif text-24 md:text-40 lg:text-[48px] leading-[1.2] font-medium mb-32 text-brand-primary opacity-90">
-                Full-stack video producer and AI visual strategist. From documentary to brand content — every frame earns its place.
+              <h2 className="font-serif text-22 md:text-32 lg:text-[40px] leading-[1.15] font-medium mb-24 text-brand-primary opacity-90">
+                {copy?.subtitle || "From commercial shoots in Perú to AI-powered creation in Miami - I make things that move people. A decade of craft in every frame and workflow."}
               </h2>
               <div className="flex flex-wrap items-center gap-24">
-                <a href="#work" className="bg-brand-accent text-white px-32 py-16 font-serif font-bold text-20 md:text-36 lg:text-[44px] cursor-pointer hover:scale-105 active:scale-95 transition-all tracking-tight shadow-[0_0_30px_rgba(255,56,49,0.3)] no-underline">
-                  My Work
+                <a href="#work" className="bg-brand-accent text-white px-32 py-16 font-serif font-bold text-20 md:text-36 lg:text-[44px] cursor-pointer hover:scale-105 active:scale-95 transition-all tracking-tight shadow-[0_0_30px_rgba(var(--color-accent-rgb),0.3)] no-underline">
+                  {copy?.cta || 'See My Work'}
                 </a>
                 <p className="text-15 opacity-60 max-w-[180px] leading-snug font-medium">
-                  10+ years of craft. AI-first execution.
+                  {copy?.caption || 'Lima -> Miami. Camera to code.'}
                 </p>
               </div>
             </div>

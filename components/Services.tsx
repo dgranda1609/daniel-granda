@@ -1,23 +1,24 @@
 
 import React, { useState } from 'react';
 import PhysicsTags from './PhysicsTags';
+import type { ServicesCopy } from '../lib/copyVariants';
 
 const SERVICES = [
   {
     title: 'MOTION',
-    description: 'Cinematic video from concept to color. Brand films, documentaries, animated explainers — 150+ projects delivered.',
+    description: 'This is where it started - cinematic video from concept to color. Brand films, documentaries, animated explainers. Over 150 projects, from Got Talent to the United Nations. Every frame is a decision.',
     tags: ['Video', '2D Animation', 'Storyboarding', 'Motion Design', 'Motion Identity', 'Films', 'Documentaries', 'Editing', 'Color Grading'],
     imageUrl: '/images/motion-hero.webp'
   },
   {
     title: 'AI SYSTEMS',
-    description: 'Production pipelines that think. n8n automations, AI-powered post, smart review workflows. Approvals: 70% → 96%.',
+    description: "The craft doesn't change - but the speed does. I build production pipelines with n8n and Claude, AI-powered post-production, and smart review workflows that took approval rates from 70% to 96%. Same quality, ten times the output.",
     tags: ['Workflow Automation', 'n8n Pipelines', 'GPT Tools', 'Image Generation', 'AI Integration', 'Prompt Engineering', 'System Design'],
     imageUrl: '/images/ai-systems-hero.webp'
   },
   {
     title: 'BRANDING',
-    description: 'Visual identity and marketing systems. From Shark Tank brands to UN campaigns.',
+    description: 'Visual identity and marketing systems built with the eye of a filmmaker. From Shark Tank brands to UN campaigns to DTC beauty - I design brands that look as good as they perform.',
     tags: ['Brand Strategy', 'Visual Identity', 'Logo Design', 'Brand Guidelines', 'Positioning', 'Messaging', 'Brand Systems', 'Packaging'],
     imageUrl: '/images/kreyolessence-3x4-img-1.jpg'
   },
@@ -26,7 +27,11 @@ const SERVICES = [
 // Detect touch/coarse pointer device
 const isTouch = () => typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches;
 
-export const Services: React.FC = () => {
+interface ServicesProps {
+  copy?: ServicesCopy;
+}
+
+export const Services: React.FC<ServicesProps> = ({ copy }) => {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   const handleEnter = (idx: number) => {
@@ -47,12 +52,12 @@ export const Services: React.FC = () => {
     <section id="services" className="py-64 md:py-128 px-24 md:px-64 text-center">
       <div className="reveal mb-48">
         <h3 className="font-serif text-40 md:text-80 lg:text-[110px] xl:text-[120px] font-medium tracking-tight mb-32 text-brand-primary">
-          What I build.
+          {copy?.headline || 'What I do best.'}
         </h3>
       </div>
 
       <div className="flex flex-col gap-0 md:gap-8">
-        {SERVICES.map((service, idx) => {
+        {(copy?.services ? SERVICES.map((s, i) => ({ ...s, title: copy.services[i]?.title || s.title, description: copy.services[i]?.description || s.description })) : SERVICES).map((service, idx) => {
           const isActive = hoveredIndex === idx;
           return (
             <div

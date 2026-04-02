@@ -2,6 +2,7 @@ import React, { useRef, useMemo, useState, useEffect } from 'react';
 import { motion, useScroll, useTransform, useSpring, MotionValue, useVelocity } from 'framer-motion';
 import { useCanvasAnimation } from '../../hooks/useParticles';
 import { WordReveal } from '../Manifesto';
+import type { GalleryCopy } from '../../lib/copyVariants';
 
 export interface GalleryProject {
   id: string;
@@ -13,6 +14,7 @@ export interface GalleryProject {
 
 interface SceneProps {
   projects: GalleryProject[];
+  copy?: GalleryCopy;
 }
 
 const NarrativeText = ({ text, scrollYProgress, start, end, highlightWord, alignClass, textAlign }: {text: string, scrollYProgress: MotionValue<number>, start: number, end: number, highlightWord?: string, alignClass: string, textAlign: string}) => {
@@ -42,7 +44,7 @@ const NarrativeText = ({ text, scrollYProgress, start, end, highlightWord, align
       style={{ opacity, filter: blur }}
       className={`absolute ${alignClass} flex flex-col pointer-events-none max-w-[80vw] md:max-w-3xl`}
     >
-      <h2 className={`font-serif text-36 md:text-56 lg:text-[76px] font-medium italic tracking-tight ${textAlign} leading-[1.05] text-brand-primary mix-blend-difference drop-shadow-[0_4px_30px_rgba(0,0,0,0.8)]`}>
+      <h2 className={`font-serif text-36 md:text-56 lg:text-[76px] font-medium italic tracking-tight ${textAlign} leading-[1.05] text-[#FFFDDB] drop-shadow-[0_4px_30px_rgba(0,0,0,0.8)]`}>
         <WordReveal text={text} progress={wordProgress} highlightWord={highlightWord} />
       </h2>
     </motion.div>
@@ -116,6 +118,16 @@ const ProjectItem: React.FC<{ project: GalleryProject; index: number; scrollYPro
     return (perspective / dist) * 0.75; 
   });
 
+  // Global color reveal across the scene:
+  // start fully monochrome, then gradually restore color as scrolling progresses.
+  const colorFilter = useTransform(scrollYProgress, (latest) => {
+    const t = Math.max(0, Math.min(1, latest));
+    const grayscale = Math.round((1 - t) * 100);
+    const saturation = Math.round(20 + t * 80);
+    const brightness = 70 + t * 30;
+    return `grayscale(${grayscale}%) saturate(${saturation}%) contrast(125%) brightness(${brightness}%)`;
+  });
+
   return (
     <motion.div
       style={{
@@ -135,13 +147,14 @@ const ProjectItem: React.FC<{ project: GalleryProject; index: number; scrollYPro
       className="w-1/3 md:w-3/12 aspect-video pointer-events-none will-change-transform"
     >
       <div className="w-full h-full relative group">
-        <img
+        <motion.img
           src={project.image}
           alt={project.title}
-          className="w-full h-full object-cover grayscale contrast-125 brightness-75 group-hover:grayscale-0 transition-all duration-700 ease-out shadow-2xl"
+          className="w-full h-full object-cover shadow-2xl"
+          style={{ filter: colorFilter }}
           loading="lazy"
         />
-        <div className="absolute -bottom-12 left-0 text-brand-primary mix-blend-difference whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <div className="absolute -bottom-12 left-0 text-[#FFFDDB] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <p className="text-[10px] uppercase tracking-[0.2em]">{project.category}</p>
           <h3 className="text-xl font-light uppercase tracking-tight">{project.title}</h3>
         </div>
@@ -150,9 +163,50 @@ const ProjectItem: React.FC<{ project: GalleryProject; index: number; scrollYPro
   );
 };
 
-export const Scene = ({ projects }: SceneProps) => {
+const defaultCopy: GalleryCopy = {
+  eyebrow: 'A story in motion',
+  titleLine1: 'Through',
+  titleLine2: 'My Lens',
+  narratives: [
+    {
+      text: "I've seen through a lens since I was little.",
+      highlightWord: 'lens',
+      alignClass: 'top-[25vh] left-[20vw] md:left-[25vw] items-start',
+      textAlign: 'text-left',
+      start: 0.1,
+      end: 0.28,
+    },
+    {
+      text: 'From Lima film sets to live TV, I learned to move with the moment.',
+      highlightWord: 'moment',
+      alignClass: 'top-[35vh] right-[20vw] md:right-[25vw] items-end',
+      textAlign: 'text-right',
+      start: 0.32,
+      end: 0.5,
+    },
+    {
+      text: 'Today AI helps me iterate faster without losing the human feel.',
+      highlightWord: 'human',
+      alignClass: 'bottom-[35vh] left-[20vw] md:left-[25vw] items-start',
+      textAlign: 'text-left',
+      start: 0.54,
+      end: 0.72,
+    },
+    {
+      text: 'The tools evolve. The eye stays honest.',
+      highlightWord: 'eye',
+      alignClass: 'bottom-[25vh] right-[20vw] md:right-[25vw] items-end',
+      textAlign: 'text-right',
+      start: 0.76,
+      end: 0.95,
+    },
+  ],
+};
+
+export const Scene = ({ projects, copy }: SceneProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const activeCopy = copy ?? defaultCopy;
   
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -191,12 +245,12 @@ export const Scene = ({ projects }: SceneProps) => {
              }}
              className="absolute inset-0 flex items-center justify-center pointer-events-none z-10"
            >
-             <div className="text-brand-primary text-center mix-blend-difference">
-               <p className="text-xs uppercase tracking-[0.5em] mb-6 text-brand-primary opacity-50">Portfolio</p>
+             <div className="text-[#FFFDDB] text-center">
+               <p className="text-xs uppercase tracking-[0.5em] mb-6 text-[#FFFDDB] opacity-70">{activeCopy.eyebrow}</p>
                <h1 className="text-6xl md:text-9xl font-serif font-light leading-[0.8]">
-                 <span className="italic">Selected</span>
+                 <span className="italic">{activeCopy.titleLine1}</span>
                  <br />
-                 <span className="italic">Works</span>
+                 <span className="italic">{activeCopy.titleLine2}</span>
                </h1>
              </div>
            </motion.div>
@@ -215,10 +269,18 @@ export const Scene = ({ projects }: SceneProps) => {
 
         {/* Overlay Narrative Texts (Outside 3D context to guarantee top Z-index) */}
         <div className="absolute inset-0 pointer-events-none z-[100]">
-          <NarrativeText alignClass="top-[25vh] left-[20vw] md:left-[25vw] items-start" textAlign="text-left" text="I've seen through a lens since I was little." scrollYProgress={smoothScroll} start={0.1} end={0.28} highlightWord="lens" />
-          <NarrativeText alignClass="top-[35vh] right-[20vw] md:right-[25vw] items-end" textAlign="text-right" text="Now, AI expands what's possible." scrollYProgress={smoothScroll} start={0.32} end={0.5} highlightWord="possible" />
-          <NarrativeText alignClass="bottom-[35vh] left-[20vw] md:left-[25vw] items-start" textAlign="text-left" text="We iterate faster and push boundaries." scrollYProgress={smoothScroll} start={0.54} end={0.72} highlightWord="boundaries" />
-          <NarrativeText alignClass="bottom-[25vh] right-[20vw] md:right-[25vw] items-end" textAlign="text-right" text="But the human eye defines the vision." scrollYProgress={smoothScroll} start={0.76} end={0.95} highlightWord="vision" />
+          {activeCopy.narratives.map((line, index) => (
+            <NarrativeText
+              key={`${line.text}-${index}`}
+              alignClass={line.alignClass}
+              textAlign={line.textAlign}
+              text={line.text}
+              scrollYProgress={smoothScroll}
+              start={line.start}
+              end={line.end}
+              highlightWord={line.highlightWord}
+            />
+          ))}
         </div>
       </div>
     </div>

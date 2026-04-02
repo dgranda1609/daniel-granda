@@ -63,7 +63,7 @@ export const CaseStudy: React.FC = () => {
                 {/* Big Bold Text */}
                 <div className="relative z-10 text-center px-6 animate-pulse-slow">
                     <h1 className="font-heading font-black text-6xl md:text-9xl uppercase tracking-tighter leading-none mb-4 text-transparent bg-clip-text bg-gradient-to-br from-brand-primary to-brand-secondary/50"
-                        style={{ textShadow: '0 0 40px rgba(255,56,49,0.3)' }}>
+                        style={{ textShadow: '0 0 40px rgba(var(--color-accent-rgb),0.3)' }}>
                         {project.title}
                     </h1>
                     <p className="font-serif italic text-2xl md:text-3xl text-brand-accent mt-4">

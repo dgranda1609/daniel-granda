@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react';
+import type { ContactCopy } from '../lib/copyVariants';
 // AnimatedGradientBackground removed — card-only design
 
 interface ContactModalProps {
   isOpen: boolean;
   onClose: () => void;
+  copy?: ContactCopy;
 }
 
 const API_BASE = (import.meta as any).env?.VITE_API_URL || 'http://localhost:4000';
 
 type FormStatus = 'idle' | 'sending' | 'success' | 'error';
 
-export const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) => {
+export const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose, copy }) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [company, setCompany] = useState('');
@@ -108,7 +110,7 @@ export const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) =
           style={{
             background: 'var(--color-modal-bg)',
             backdropFilter: 'blur(40px) saturate(180%)',
-            boxShadow: '0 40px 100px rgba(255, 56, 49, 0.15), 0 0 0 1px var(--color-glass-border)',
+            boxShadow: '0 40px 100px rgba(var(--color-accent-rgb), 0.15), 0 0 0 1px var(--color-glass-border)',
           }}
         >
           {/* Header accent bar */}
@@ -119,7 +121,7 @@ export const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) =
               /* Success state */
               <div className="text-center py-16">
                 <div className="w-48 h-48 mx-auto mb-16 rounded-full bg-brand-accent/10 flex items-center justify-center">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#FF3831" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
                 </div>
@@ -141,10 +143,10 @@ export const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) =
               <>
                 <div className="mb-20">
                   <h2 className="font-serif text-24 md:text-32 font-bold text-brand-primary leading-[0.95] tracking-tight">
-                    Let's build<br />something great.
+                    {copy?.headline || "Tell me what you're working on."}
                   </h2>
                   <p className="text-13 text-brand-primary/50 font-body mt-12">
-                    Tell me about your project and I'll get back to you within 24 hours.
+                    {copy?.sub || "I'd love to hear about your project. I'll get back to you within 24 hours."}
                   </p>
                 </div>
 
@@ -218,7 +220,7 @@ export const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) =
                   <button
                     type="submit"
                     disabled={status === 'sending'}
-                    className="w-full bg-brand-accent text-white py-12 font-serif font-bold text-16 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_0_30px_rgba(255,56,49,0.3)] mt-8"
+                    className="w-full bg-brand-accent text-white py-12 font-serif font-bold text-16 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_0_30px_rgba(var(--color-accent-rgb),0.3)] mt-8"
                   >
                     {status === 'sending' ? (
                       <span className="flex items-center justify-center gap-8">
